@@ -1,0 +1,5 @@
+let frase = "Eu amo programar"
+if (contains(frase, "amo"))
+begin
+  write("Contém 'amo'")
+end

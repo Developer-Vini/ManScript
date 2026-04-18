@@ -1,0 +1,58 @@
+let rodando = 1
+
+while (rodando == 1)
+begin
+  write("=== CALCULADORA ===")
+  input("Primeiro numero: ", a)
+  input("Operador (+, -, *, /, %): ", op)
+  input("Segundo numero: ", b)
+
+  let na = int(a)
+  let nb = int(b)
+  let res = 0
+  let ok = 1
+
+  if (op == "+")
+  begin
+    let res = na + nb
+  end
+  if (op == "-")
+  begin
+    let res = na - nb
+  end
+  if (op == "*")
+  begin
+    let res = na * nb
+  end
+  if (op == "/")
+  begin
+    if (nb == 0)
+    begin
+      write("Erro: divisao por zero!")
+      let ok = 0
+    else
+      let res = na / nb
+    end
+  end
+  if (op == "%")
+  begin
+    if (nb == 0)
+    begin
+      write("Erro: modulo por zero!")
+      let ok = 0
+    else
+      let res = na % nb
+    end
+  end
+
+  if (ok == 1)
+  begin
+    write(a + " " + op + " " + b + " = " + str(res))
+  end
+
+  input("Calcular de novo? (sim/nao): ", cont)
+  if (lower(cont) != "sim")
+  begin
+    let rodando = 0
+  end
+end

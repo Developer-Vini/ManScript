@@ -1,0 +1,13 @@
+let a = 10
+let b = 25
+let c = 18
+let max = a
+if (b > max)
+begin
+  let max = b
+end
+if (c > max)
+begin
+  let max = c
+end
+write("Maior: " + str(max))

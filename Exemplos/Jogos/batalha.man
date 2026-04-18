@@ -1,0 +1,38 @@
+let hp1 = 100
+let hp2 = 80
+let atk1 = rand(8, 18)
+let atk2 = rand(6, 16)
+let turno = 1
+
+write("=== BATALHA ===")
+write("Heroi HP: " + str(hp1) + "  Ataque: " + str(atk1))
+write("Inimigo HP: " + str(hp2) + "  Ataque: " + str(atk2))
+write("")
+
+while (hp1 > 0 and hp2 > 0)
+begin
+  write("--- Turno " + str(turno) + " ---")
+
+  let dano1 = rand(atk1 / 2, atk1)
+  let hp2 = hp2 - dano1
+  write("Heroi ataca! Dano: " + str(dano1) + "  HP Inimigo: " + str(hp2))
+
+  if (hp2 > 0)
+  begin
+    # Inimigo ataca
+    let dano2 = rand(atk2 / 2, atk2)
+    let hp1 = hp1 - dano2
+    write("Inimigo ataca! Dano: " + str(dano2) + "  HP Heroi: " + str(hp1))
+  end
+
+  let turno = turno + 1
+  sleep(300)
+end
+
+write("")
+if (hp1 > 0)
+begin
+  write("HEROI VENCEU em " + str(turno) + " turnos!")
+else
+  write("INIMIGO VENCEU em " + str(turno) + " turnos!")
+end

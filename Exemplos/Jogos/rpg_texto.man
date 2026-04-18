@@ -1,0 +1,84 @@
+input("Nome do heroi: ", nome)
+
+let hp = 100
+let atk = 10
+let ouro = 0
+let pocoes = 2
+let vivo = 1
+let nivel = 1
+
+write("=== " + upper(nome) + " ===")
+write("HP: 100  ATK: 10  Pocoes: 2")
+write("")
+
+write("--- Encontro: Goblin ---")
+let ehp = 30
+let eatk = 6
+while (hp > 0 and ehp > 0)
+begin
+  let d = rand(atk / 2, atk)
+  let ehp = ehp - d
+  write(nome + " ataca! Dano: " + str(d) + "  Goblin HP: " + str(ehp))
+  if (ehp > 0)
+  begin
+    let ed = rand(1, eatk)
+    let hp = hp - ed
+    write("Goblin ataca! Dano: " + str(ed) + "  " + nome + " HP: " + str(hp))
+  end
+end
+if (ehp <= 0)
+begin
+  write("Goblin derrotado! +5 ouro")
+  let ouro = ouro + 5
+end
+
+write("")
+write("=== LOJA ===")
+write("Ouro: " + str(ouro))
+write("1=Pocao de vida (+30 HP) custa 3 ouro")
+write("2=Espada (+5 ATK) custa 4 ouro")
+input("Comprar? (1/2/nao): ", compra)
+if (compra == "1" and ouro >= 3)
+begin
+  let hp = hp + 30
+  let ouro = ouro - 3
+  write("HP recuperado! HP atual: " + str(hp))
+end
+if (compra == "2" and ouro >= 4)
+begin
+  let atk = atk + 5
+  let ouro = ouro - 4
+  write("Novo ATK: " + str(atk))
+end
+
+write("")
+write("--- CHEFE: Dragao ---")
+let ehp = 80
+let eatk = 15
+while (hp > 0 and ehp > 0)
+begin
+  let d = rand(atk / 2, atk)
+  let ehp = ehp - d
+  write(nome + " ataca! Dano: " + str(d) + "  Dragao HP: " + str(ehp))
+  if (ehp > 0)
+  begin
+    let ed = rand(5, eatk)
+    let hp = hp - ed
+    write("Dragao ataca! Dano: " + str(ed) + "  " + nome + " HP: " + str(hp))
+    if (hp <= 20 and pocoes > 0)
+    begin
+      let hp = hp + 30
+      let pocoes = pocoes - 1
+      write("Usou pocao! HP: " + str(hp))
+    end
+  end
+end
+
+write("")
+if (hp > 0)
+begin
+  write("=== VITORIA! " + upper(nome) + " derrotou o Dragao! ===")
+  write("HP restante: " + str(hp) + "  Ouro: " + str(ouro))
+else
+  write("=== DERROTA! " + nome + " foi derrotado... ===")
+end

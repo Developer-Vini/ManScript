@@ -1,0 +1,11 @@
+array v[4]
+v[0]="a"
+v[1]="b"
+v[2]="c"
+v[3]="d"
+let i=3
+while(i>=0)
+begin
+  write(v[i])
+  let i=i-1
+end

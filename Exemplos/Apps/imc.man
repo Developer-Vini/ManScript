@@ -1,0 +1,31 @@
+write("=== CALCULADORA DE IMC ===")
+input("Seu peso em kg (numero inteiro): ", peso)
+input("Sua altura em cm (ex: 170): ", altura)
+
+let p = int(peso)
+let h = int(altura)
+
+let imc = p * 10000 / (h * h)
+
+write("")
+write("Peso:   " + str(p) + " kg")
+write("Altura: " + str(h) + " cm")
+write("IMC:    " + str(imc))
+write("")
+
+if (imc < 18)
+begin
+  write("Classificacao: Abaixo do peso")
+else
+  if (imc < 25)
+  begin
+    write("Classificacao: Peso normal - Parabens!")
+  else
+    if (imc < 30)
+    begin
+      write("Classificacao: Sobrepeso")
+    else
+      write("Classificacao: Obesidade - Consulte um medico")
+    end
+  end
+end

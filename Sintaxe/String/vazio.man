@@ -1,0 +1,7 @@
+input("Digite algo: ", v)
+if (len(v) == 0)
+begin
+  write("Nada digitado!")
+else
+  write("Você digitou: " + v)
+end

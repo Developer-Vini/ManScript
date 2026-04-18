@@ -1,0 +1,5 @@
+let x = 10
+if (x > 5)
+begin
+  write("Maior que 5")
+end

@@ -1,0 +1,3 @@
+let vidas = 3
+let vidas = vidas - 1
+write(vidas)

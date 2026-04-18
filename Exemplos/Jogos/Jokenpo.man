@@ -1,0 +1,76 @@
+let jogando = 1
+let vitorias = 0
+let derrotas = 0
+let empates = 0
+
+while (jogando == 1)
+begin
+  write("=== Pedra, Papel e Tesoura ===")
+  write("1 = Pedra  2 = Papel  3 = Tesoura  0 = Sair")
+  input("Sua escolha: ", esc)
+
+  if (esc == "0")
+  begin
+    let jogando = 0
+  else
+    let pc = rand(1, 3)
+    let pcnome = "Tesoura"
+    if (pc == 1)
+    begin
+      let pcnome = "Pedra"
+    end
+    if (pc == 2)
+    begin
+      let pcnome = "Papel"
+    end
+
+    let enome = "Invalido"
+    if (esc == "1")
+    begin
+      let enome = "Pedra"
+    end
+    if (esc == "2")
+    begin
+      let enome = "Papel"
+    end
+    if (esc == "3")
+    begin
+      let enome = "Tesoura"
+    end
+
+    write("Voce: " + enome + "  |  PC: " + pcnome)
+
+    if (enome == pcnome)
+    begin
+      write("Empate!")
+      let empates = empates + 1
+    else
+      let ganhou = 0
+      if (esc == "1" and pc == 3)
+      begin
+        let ganhou = 1
+      end
+      if (esc == "2" and pc == 1)
+      begin
+        let ganhou = 1
+      end
+      if (esc == "3" and pc == 2)
+      begin
+        let ganhou = 1
+      end
+      if (ganhou == 1)
+      begin
+        write("Voce GANHOU!")
+        let vitorias = vitorias + 1
+      else
+        write("Voce PERDEU!")
+        let derrotas = derrotas + 1
+      end
+    end
+  end
+end
+
+write("=== Placar Final ===")
+write("Vitorias: " + str(vitorias))
+write("Derrotas: " + str(derrotas))
+write("Empates:  " + str(empates))

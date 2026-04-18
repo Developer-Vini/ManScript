@@ -1,0 +1,5 @@
+let cor = "azul"
+if (cor == "azul")
+begin
+  write("É azul!")
+end

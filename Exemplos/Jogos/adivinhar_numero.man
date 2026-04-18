@@ -1,0 +1,28 @@
+# Adivinha o Numero - CORRIGIDO
+let alvo = rand(1, 100)
+let salvo = str(alvo)
+let tentativas = 0
+let acertou = 0
+
+write("Adivinhe o numero entre 1 e 100!")
+
+while (acertou == 0)
+begin
+  input("Seu palpite: ", p)
+  let tentativas = tentativas + 1
+
+  if (p == salvo)
+  begin
+    let acertou = 1
+    write("ACERTOU em " + str(tentativas) + " tentativas!")
+  else
+    let pn = int(p)
+    let an = int(salvo)
+    if (pn < an)
+    begin
+      write("Muito baixo! Tente maior.")
+    else
+      write("Muito alto! Tente menor.")
+    end
+  end
+end

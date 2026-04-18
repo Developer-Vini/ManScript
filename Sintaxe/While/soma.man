@@ -1,0 +1,8 @@
+let soma = 0
+let i = 1
+while (i <= 100)
+begin
+  let soma = soma + i
+  let i = i + 1
+end
+write("Soma: " + str(soma))

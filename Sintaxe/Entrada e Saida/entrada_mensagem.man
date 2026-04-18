@@ -1,0 +1,2 @@
+input("Qual seu nome?", nome)
+write("Olá, " + nome)

@@ -1,0 +1,148 @@
+let acertos = 0
+let total = 15
+
+write("=== QUIZ ===")
+write("Responda as " + str(total) + " perguntas:")
+write("")
+
+input("1. Qual e a capital do Brasil? ", r1)
+if (lower(r1) == "brasilia")
+begin
+  write("Correto!")
+  acertos = acertos + 1
+else
+  write("Errado! Era Brasilia.")
+end
+
+input("2. Quanto e 8 x 7? ", r2)
+if (r2 == "56")
+begin
+  write("Correto!")
+  acertos = acertos + 1
+else
+  write("Errado! Era 56.")
+end
+
+input("3. Qual planeta e o maior? ", r3)
+if (lower(r3) == "jupiter")
+begin
+  write("Correto!")
+  acertos = acertos + 1
+else
+  write("Errado! Era Jupiter.")
+end
+
+input("4. Em que ano o Brasil foi descoberto? ", r4)
+if (r4 == "1500")
+begin
+  write("Correto!")
+  acertos = acertos + 1
+else
+  write("Errado! Era 1500.")
+end
+
+input("5. Qual e o menor numero primo? ", r5)
+if (r5 == "2")
+begin
+  write("Correto!")
+  acertos = acertos + 1
+else
+  write("Errado! Era 2.")
+end
+
+input("6. Qual e o maior oceano do mundo? ", r6)
+if (lower(r6) == "pacifico")
+begin
+  write("Correto!")
+  acertos = acertos + 1
+else
+  write("Errado! Era Pacifico.")
+end
+
+input("7. Quanto e 12 x 12? ", r7)
+if (r7 == "144")
+begin
+  write("Correto!")
+  acertos = acertos + 1
+else
+  write("Errado! Era 144.")
+end
+
+input("8. Quem pintou a Mona Lisa? ", r8)
+if (lower(r8) == "leonardo da vinci")
+begin
+  write("Correto!")
+  acertos = acertos + 1
+else
+  write("Errado! Era Leonardo da Vinci.")
+end
+
+input("9. Qual e o pais mais populoso do mundo? ", r9)
+if (lower(r9) == "india")
+begin
+  write("Correto!")
+  acertos = acertos + 1
+else
+  write("Errado! Era India.")
+end
+
+input("10. Quanto e a raiz quadrada de 81? ", r10)
+if (r10 == "9")
+begin
+  write("Correto!")
+  acertos = acertos + 1
+else
+  write("Errado! Era 9.")
+end
+
+input("11. Qual e o continente do Egito? ", r11)
+if (lower(r11) == "africa")
+begin
+  write("Correto!")
+  acertos = acertos + 1
+else
+  write("Errado! Era Africa.")
+end
+
+input("12. Quanto e 100 dividido por 4? ", r12)
+if (r12 == "25")
+begin
+  write("Correto!")
+  acertos = acertos + 1
+else
+  write("Errado! Era 25.")
+end
+
+input("13. Qual e o simbolo quimico da agua? ", r13)
+if (lower(r13) == "h2o")
+begin
+  write("Correto!")
+  acertos = acertos + 1
+else
+  write("Errado! Era H2O.")
+end
+
+input("14. Quem foi o primeiro homem a pisar na Lua? ", r14)
+if (lower(r14) == "neil armstrong")
+begin
+  write("Correto!")
+  acertos = acertos + 1
+else
+  write("Errado! Era Neil Armstrong.")
+end
+
+input("15. Quanto e 15 + 27? ", r15)
+if (r15 == "42")
+begin
+  write("Correto!")
+  acertos = acertos + 1
+else
+  write("Errado! Era 42.")
+end
+
+write("")
+write("=== Resultado ===")
+write("Acertos: " + str(acertos) + " de " + str(total))
+
+let nota = acertos * 2 / 3
+write("Nota: " + str(nota) + "/10")

@@ -1,0 +1,24 @@
+write("=== GERADOR DE SENHA ===")
+input("Tamanho da senha (4-20): ", tam)
+let t = int(tam)
+
+if (t < 4)
+begin
+  let t = 4
+end
+if (t > 20)
+begin
+  let t = 20
+end
+
+let i = 0
+writeln("Senha gerada: ")
+while (i < t)
+begin
+  let digito = rand(0, 9)
+  writeln(str(digito))
+  let i = i + 1
+end
+write("")
+
+write("Senha de " + str(t) + " digitos gerada!")

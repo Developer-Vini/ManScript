@@ -1,0 +1,7 @@
+input("Nome: ", nome)
+input("Idade: ", idade)
+input("Cidade: ", cidade)
+write("--- Cadastro ---")
+write("Nome:   " + nome)
+write("Idade:  " + idade)
+write("Cidade: " + cidade)

@@ -1,0 +1,30 @@
+let jogando = 1
+
+while (jogando == 1)
+begin
+  write("=== DADOS RPG ===")
+  write("Qual dado? 4 / 6 / 8 / 10 / 12 / 20 / 0=sair")
+  input("Dado: d", dado)
+  let d = int(dado)
+
+  if (d == 0)
+  begin
+    let jogando = 0
+  else
+    input("Quantos dados? ", qtd)
+    let q = int(qtd)
+    let soma = 0
+    let i = 1
+
+    while (i <= q)
+    begin
+      let r = rand(1, d)
+      write("  Dado " + str(i) + ": " + str(r))
+      let soma = soma + r
+      let i = i + 1
+    end
+
+    write("TOTAL: " + str(soma))
+    write("")
+  end
+end

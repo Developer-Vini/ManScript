@@ -1,0 +1,7 @@
+let i = 1
+while (i <= 10)
+begin
+  let r = 7 * i
+  write("7 x " + str(i) + " = " + str(r))
+  let i = i + 1
+end

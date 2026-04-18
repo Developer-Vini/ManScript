@@ -1,0 +1,35 @@
+write("=== TREINO DE TABUADA ===")
+input("Quantas questoes? ", qtd)
+let q = int(qtd)
+
+let acertos = 0
+let erros = 0
+let i = 0
+
+while (i < q)
+begin
+  let a = rand(1, 10)
+  let b = rand(1, 10)
+  let correto = a * b
+
+  input("Quanto e " + str(a) + " x " + str(b) + "? ", resp)
+  let r = int(resp)
+
+  if (r == correto)
+  begin
+    write("Correto!")
+    let acertos = acertos + 1
+  else
+    write("Errado! Era " + str(correto))
+    let erros = erros + 1
+  end
+
+  let i = i + 1
+end
+
+write("")
+write("=== Resultado ===")
+write("Acertos: " + str(acertos))
+write("Erros:   " + str(erros))
+let pct = acertos * 100 / q
+write("Aproveitamento: " + str(pct) + "%")

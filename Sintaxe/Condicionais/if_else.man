@@ -1,0 +1,7 @@
+let n = 3
+if (n % 2 == 0)
+begin
+  write("Par")
+else
+  write("Ímpar")
+end

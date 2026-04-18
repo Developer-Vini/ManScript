@@ -1,0 +1,8 @@
+let alvo = rand(1, 10)
+input("Adivinhe (1-10): ", g)
+if (int(g) == alvo)
+begin
+  write("Acertou!")
+else
+  write("Errou! Era " + str(alvo))
+end

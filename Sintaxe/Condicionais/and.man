@@ -1,0 +1,5 @@
+let x = 15
+if (x > 10 and x < 20)
+begin
+  write("Entre 10 e 20")
+end

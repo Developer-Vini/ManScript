@@ -1,0 +1,68 @@
+array nomes[10]
+array fones[10]
+let total = 0
+let rodando = 1
+
+while (rodando == 1)
+begin
+  write("=== AGENDA ===")
+  write("1=Adicionar  2=Listar  3=Buscar  0=Sair")
+  input("Opcao: ", op)
+
+  if (op == "0")
+  begin
+    let rodando = 0
+  end
+
+  if (op == "1")
+  begin
+    if (total >= 10)
+    begin
+      write("Agenda cheia!")
+    else
+      input("Nome: ", nm)
+      input("Telefone: ", fn)
+      nomes[total] = nm
+      fones[total] = fn
+      let total = total + 1
+      write("Contato adicionado! Total: " + str(total))
+    end
+  end
+
+  if (op == "2")
+  begin
+    if (total == 0)
+    begin
+      write("Agenda vazia.")
+    else
+      write("--- Contatos ---")
+      let i = 0
+      while (i < total)
+      begin
+        write(str(i+1) + ". " + nomes[i] + " - " + fones[i])
+        let i = i + 1
+      end
+    end
+  end
+
+  if (op == "3")
+  begin
+    input("Buscar nome: ", busca)
+    let achei = 0
+    let i = 0
+    while (i < total)
+    begin
+      if (lower(nomes[i]) == lower(busca))
+      begin
+        write("Encontrado: " + nomes[i] + " - " + fones[i])
+        let achei = 1
+      end
+      let i = i + 1
+    end
+    if (achei == 0)
+    begin
+      write("Contato nao encontrado.")
+    end
+  end
+  write("")
+end

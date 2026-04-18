@@ -1,0 +1,19 @@
+input("Número: ", n)
+let ni = int(n)
+let primo = 1
+let d = 2
+while (d < ni)
+begin
+  if (ni % d == 0)
+  begin
+    let primo = 0
+    break
+  end
+  let d = d + 1
+end
+if (primo == 1)
+begin
+  write(str(ni) + " é primo")
+else
+  write(str(ni) + " não é primo")
+end

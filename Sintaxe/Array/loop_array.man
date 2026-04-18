@@ -1,0 +1,11 @@
+array v[4]
+v[0] = "Ana"
+v[1] = "Bob"
+v[2] = "Cid"
+v[3] = "Dani"
+let i = 0
+while (i < 4)
+begin
+  write(v[i])
+  let i = i + 1
+end

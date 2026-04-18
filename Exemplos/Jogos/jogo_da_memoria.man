@@ -1,0 +1,75 @@
+array board[8]
+array revelado[8]
+
+board[0] = "1"
+board[1] = "2"
+board[2] = "3"
+board[3] = "4"
+board[4] = "1"
+board[5] = "2"
+board[6] = "3"
+board[7] = "4"
+
+let i = 0
+while (i < 20)
+begin
+  let a = rand(0, 7)
+  let b = rand(0, 7)
+  let tmp = board[a]
+  board[a] = board[b]
+  board[b] = tmp
+  let i = i + 1
+end
+
+let i = 0
+while (i < 8)
+begin
+  revelado[i] = "0"
+  let i = i + 1
+end
+
+let pares = 0
+let tentativas = 0
+
+write("=== JOGO DA MEMORIA ===")
+write("Encontre os 4 pares! Indices de 0 a 7.")
+
+while (pares < 4)
+begin
+  write("")
+  writeln("Tabuleiro: ")
+  let i = 0
+  while (i < 8)
+  begin
+    if (revelado[i] == "1")
+    begin
+      writeln("[" + board[i] + "]")
+    else
+      writeln("[?]")
+    end
+    let i = i + 1
+  end
+  write("")
+
+  input("Primeiro indice (0-7): ", i1)
+  input("Segundo indice (0-7): ", i2)
+  let n1 = int(i1)
+  let n2 = int(i2)
+  let tentativas = tentativas + 1
+
+  write("Posicao " + str(n1) + ": " + board[n1])
+  write("Posicao " + str(n2) + ": " + board[n2])
+
+  if (board[n1] == board[n2] and n1 != n2)
+  begin
+    write("PAR ENCONTRADO!")
+    revelado[n1] = "1"
+    revelado[n2] = "1"
+    let pares = pares + 1
+  else
+    write("Nao formam par.")
+  end
+end
+
+write("")
+write("=== PARABENS! Completou em " + str(tentativas) + " tentativas! ===")

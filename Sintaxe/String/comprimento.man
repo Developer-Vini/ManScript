@@ -1,0 +1,3 @@
+let s = "Brasil"
+let t = len(s)
+write("Tamanho: " + str(t))

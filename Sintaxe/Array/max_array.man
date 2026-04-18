@@ -1,0 +1,17 @@
+array v[5]
+v[0]=3
+v[1]=9
+v[2]=1
+v[3]=7
+v[4]=5
+let max=int(v[0])
+let i=1
+while(i<5)
+begin
+  if(int(v[i])>max)
+  begin
+    let max=int(v[i])
+  end
+  let i=i+1
+end
+write("Máximo: "+str(max))

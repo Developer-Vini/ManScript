@@ -1,0 +1,9 @@
+let n = 6
+let fat = 1
+let i = 2
+while (i <= n)
+begin
+  let fat = fat * i
+  let i = i + 1
+end
+write("Fatorial: " + str(fat))
