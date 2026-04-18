@@ -26,8 +26,8 @@
 Clone o repositório e compile com GCC:
 
 ```bash
-git clone https://github.com/seu-usuario/man-lang
-cd man-lang
+git clone https://github.com/seu-usuario/ManScript
+cd ManScript
 gcc -o man main.c
 ```
 
