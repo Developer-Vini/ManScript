@@ -1,4 +1,3 @@
-# Adivinha o Numero - CORRIGIDO
 let alvo = rand(1, 100)
 let salvo = str(alvo)
 let tentativas = 0
