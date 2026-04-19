@@ -1,3 +1,6 @@
+<img src="logo.png">
+
+
 # MAN 
 
 **MAN** é uma linguagem de script simples e interpretada, escrita em C, com suporte a variáveis, arrays, condicionais, laços, funções embutidas e entrada/saída. Ideal para aprender os fundamentos de linguagens de programação ou criar scripts.
