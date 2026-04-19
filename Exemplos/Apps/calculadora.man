@@ -1,58 +1,39 @@
-let rodando = 1
+write("=== CALCULADORA ===")
 
-while (rodando == 1)
+while (1 == 1)
 begin
-  write("=== CALCULADORA ===")
-  input("Primeiro numero: ", a)
-  input("Operador (+, -, *, /, %): ", op)
-  input("Segundo numero: ", b)
+    write("")
+    write("1 - Soma")
+    write("2 - Subtração")
+    write("0 - Sair")
 
-  let na = int(a)
-  let nb = int(b)
-  let res = 0
-  let ok = 1
+    input("Opção: ", op)
 
-  if (op == "+")
-  begin
-    let res = na + nb
-  end
-  if (op == "-")
-  begin
-    let res = na - nb
-  end
-  if (op == "*")
-  begin
-    let res = na * nb
-  end
-  if (op == "/")
-  begin
-    if (nb == 0)
-    begin
-      write("Erro: divisao por zero!")
-      let ok = 0
-    else
-      let res = na / nb
+    if (op == "0") begin
+        write("Saindo...")
+        break
     end
-  end
-  if (op == "%")
-  begin
-    if (nb == 0)
-    begin
-      write("Erro: modulo por zero!")
-      let ok = 0
-    else
-      let res = na % nb
+
+    # validação
+    if (op != "1" and op != "2") begin
+        write("Opção inválida!")
+        continue
     end
-  end
 
-  if (ok == 1)
-  begin
-    write(a + " " + op + " " + b + " = " + str(res))
-  end
+    input("Primeiro número: ", n1)
+    input("Segundo número: ", n2)
 
-  input("Calcular de novo? (sim/nao): ", cont)
-  if (lower(cont) != "sim")
-  begin
-    let rodando = 0
-  end
+    # soma
+    if (op == "1") begin
+        let resultado = int(n1) + int(n2)
+        write("Resultado: ")
+        write(resultado)
+    end
+
+    # subtracao
+    if (op == "2") begin
+        let resultado = int(n1) - int(n2)
+        write("Resultado: ")
+        write(resultado)
+    end
 end
