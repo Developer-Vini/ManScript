@@ -5,6 +5,8 @@ begin
     write("")
     write("1 - Soma")
     write("2 - Subtração")
+    write("3 - Multiplicacao")
+    write("4 - Divisao")
     write("0 - Sair")
 
     input("Opção: ", op)
@@ -14,8 +16,8 @@ begin
         break
     end
 
-    # validação
-    if (op != "1" and op != "2") begin
+    # validação simples
+    if (op != "1" and op != "2" and op != "3" and op != "4") begin
         write("Opção inválida!")
         continue
     end
@@ -23,16 +25,30 @@ begin
     input("Primeiro número: ", n1)
     input("Segundo número: ", n2)
 
-    # soma
+    # SOMA
     if (op == "1") begin
         let resultado = int(n1) + int(n2)
         write("Resultado: ")
         write(resultado)
     end
 
-    # subtracao
+    # SUBTRAÇÃO
     if (op == "2") begin
         let resultado = int(n1) - int(n2)
+        write("Resultado: ")
+        write(resultado)
+    end
+
+    # MULTIPLICAÇÃO
+    if (op == "3") begin 
+        let resultado = int(n1) * int(n2)
+        write("Resultado: ")
+        write(resultado)
+    end
+
+    # DIVISÃO
+    if (op == "4") begin
+        let resultado = int(n1) / int(n2)
         write("Resultado: ")
         write(resultado)
     end
