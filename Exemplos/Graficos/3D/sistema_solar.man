@@ -1,0 +1,76 @@
+3dinit
+3dcam(0, 3, -18, 0, 0)
+3dfov(500)
+
+3dsphere("sol", 1.8, 12, 20)
+3dcolor("sol", 255, 220, 50)
+3dwireframe("sol", 0)
+3dpos("sol", 0, 0, 6)
+
+3dsphere("mercurio", 0.3, 8, 12)
+3dcolor("mercurio", 180, 150, 120)
+3dwireframe("mercurio", 0)
+3dpos("mercurio", 3, 0, 6)
+
+3dsphere("venus", 0.5, 8, 12)
+3dcolor("venus", 220, 180, 80)
+3dwireframe("venus", 0)
+3dpos("venus", 5, 0, 6)
+
+3dsphere("terra", 0.55, 8, 12)
+3dcolor("terra", 60, 120, 220)
+3dwireframe("terra", 0)
+3dpos("terra", 7.5, 0, 6)
+
+3dsphere("marte", 0.4, 8, 12)
+3dcolor("marte", 200, 80, 50)
+3dwireframe("marte", 0)
+3dpos("marte", 10, 0, 6)
+
+3dplane("plano", 30, 30)
+3dcolor("plano", 20, 20, 40)
+3dwireframe("plano", 0)
+3dpos("plano", 0, -3, 8)
+
+let t = 0
+let rodando = 1
+
+while (rodando == 1)
+begin
+    bgcolor(5, 5, 15)
+    clear
+
+    let t = t + 1
+
+    let mx = 3 * 1
+    let mz = 3 * 0
+    3dpos("mercurio", mx, 0, 6)
+    3drot("mercurio", 0, t, 0)
+
+    3dpos("venus", 5, 0, 6)
+    3drot("venus", 0, t, 0)
+
+    3dpos("terra", 7, 0, 6)
+    3drot("terra", 0, t, 0)
+
+    3dpos("marte", 9, 0, 6)
+    3drot("marte", 0, t, 0)
+
+    3drot("sol", 0, t, 0)
+
+    3drender
+
+    color(255, 255, 255)
+    text(10, 10, 16, "SISTEMA SOLAR 3D")
+    color(180, 180, 180)
+    text(10, 30, 13, "ESC = sair")
+
+    render
+    sleep(16)
+
+    key(tecla)
+    if (tecla == "escape")
+    begin
+        let rodando = 0
+    end
+end

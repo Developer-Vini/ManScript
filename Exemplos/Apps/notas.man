@@ -1,0 +1,39 @@
+writeln("==============================")
+writeln("     SISTEMA DE NOTAS         ")
+writeln("==============================")
+
+input("Nome do aluno: ", nome)
+input("Nota da prova 1 (0-10): ", n1)
+input("Nota da prova 2 (0-10): ", n2)
+input("Nota da prova 3 (0-10): ", n3)
+
+let soma = int(n1) + int(n2) + int(n3)
+let media = soma / 3
+
+writeln("")
+writeln("=== RESULTADO DE " + nome + " ===")
+writeln("Prova 1: " + n1)
+writeln("Prova 2: " + n2)
+writeln("Prova 3: " + n3)
+writeln("Media:   " + media)
+writeln("")
+
+if (media >= 7)
+begin
+    writeln("SITUACAO: APROVADO!")
+end
+if (media >= 5)
+begin
+    if (media < 7)
+    begin
+        writeln("SITUACAO: RECUPERACAO")
+    end
+end
+if (media < 5)
+begin
+    writeln("SITUACAO: REPROVADO")
+end
+
+writeln("")
+writeln("Pressione Enter para sair...")
+input("", _pause)

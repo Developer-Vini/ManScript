@@ -1,0 +1,155 @@
+rcsetmap(16, 16)
+
+rcwall(0, 0, 1)
+rcwall(1, 0, 1)
+rcwall(2, 0, 1)
+rcwall(3, 0, 1)
+rcwall(4, 0, 1)
+rcwall(5, 0, 1)
+rcwall(6, 0, 1)
+rcwall(7, 0, 1)
+rcwall(8, 0, 1)
+rcwall(9, 0, 1)
+rcwall(10, 0, 1)
+rcwall(11, 0, 1)
+rcwall(12, 0, 1)
+rcwall(13, 0, 1)
+rcwall(14, 0, 1)
+rcwall(15, 0, 1)
+
+rcwall(0, 15, 1)
+rcwall(1, 15, 1)
+rcwall(2, 15, 1)
+rcwall(3, 15, 1)
+rcwall(4, 15, 1)
+rcwall(5, 15, 1)
+rcwall(6, 15, 1)
+rcwall(7, 15, 1)
+rcwall(8, 15, 1)
+rcwall(9, 15, 1)
+rcwall(10, 15, 1)
+rcwall(11, 15, 1)
+rcwall(12, 15, 1)
+rcwall(13, 15, 1)
+rcwall(14, 15, 1)
+rcwall(15, 15, 1)
+
+rcwall(0, 1, 1)
+rcwall(0, 2, 1)
+rcwall(0, 3, 1)
+rcwall(0, 4, 1)
+rcwall(0, 5, 1)
+rcwall(0, 6, 1)
+rcwall(0, 7, 1)
+rcwall(0, 8, 1)
+rcwall(0, 9, 1)
+rcwall(0, 10, 1)
+rcwall(0, 11, 1)
+rcwall(0, 12, 1)
+rcwall(0, 13, 1)
+rcwall(0, 14, 1)
+
+rcwall(15, 1, 1)
+rcwall(15, 2, 1)
+rcwall(15, 3, 1)
+rcwall(15, 4, 1)
+rcwall(15, 5, 1)
+rcwall(15, 6, 1)
+rcwall(15, 7, 1)
+rcwall(15, 8, 1)
+rcwall(15, 9, 1)
+rcwall(15, 10, 1)
+rcwall(15, 11, 1)
+rcwall(15, 12, 1)
+rcwall(15, 13, 1)
+rcwall(15, 14, 1)
+
+rcwall(4, 2, 1)
+rcwall(4, 3, 1)
+rcwall(4, 4, 1)
+rcwall(4, 5, 1)
+rcwall(5, 5, 1)
+rcwall(6, 5, 1)
+rcwall(6, 4, 1)
+rcwall(6, 3, 1)
+
+rcwall(9, 2, 1)
+rcwall(10, 2, 1)
+rcwall(11, 2, 1)
+rcwall(11, 3, 1)
+rcwall(11, 4, 1)
+rcwall(11, 5, 1)
+rcwall(10, 5, 1)
+rcwall(9, 5, 1)
+
+rcwall(2, 9, 1)
+rcwall(3, 9, 1)
+rcwall(4, 9, 1)
+rcwall(5, 9, 1)
+rcwall(5, 10, 1)
+rcwall(5, 11, 1)
+rcwall(5, 12, 1)
+
+rcwall(9, 10, 1)
+rcwall(10, 10, 1)
+rcwall(11, 10, 1)
+rcwall(12, 10, 1)
+rcwall(9, 11, 1)
+rcwall(12, 11, 1)
+rcwall(9, 12, 1)
+rcwall(12, 12, 1)
+rcwall(9, 13, 1)
+rcwall(10, 13, 1)
+rcwall(11, 13, 1)
+rcwall(12, 13, 1)
+
+rcsetceil(30, 30, 60)
+rcsetfloor(80, 60, 40)
+rcminimap(1)
+
+rcsetpos(2, 2, 1, 0)
+
+let vel = 0.08
+let rodando = 1
+
+while (rodando == 1)
+begin
+    key(tecla)
+
+    if (tecla == "up")
+    begin
+        rcmove(vel)
+    end
+    if (tecla == "down")
+    begin
+        rcmove(0 - vel)
+    end
+    if (tecla == "left")
+    begin
+        rcturn(0 - 3)
+    end
+    if (tecla == "right")
+    begin
+        rcturn(3)
+    end
+    if (tecla == "a")
+    begin
+        rcstrafe(0 - vel)
+    end
+    if (tecla == "d")
+    begin
+        rcstrafe(vel)
+    end
+    if (tecla == "escape")
+    begin
+        let rodando = 0
+    end
+
+    rcrender
+
+    color(255, 255, 255)
+    text(10, 10, 14, "DUNGEON  -  setas: mover/girar  A/D: strafe  ESC: sair")
+
+    render
+    sleep(16)
+end

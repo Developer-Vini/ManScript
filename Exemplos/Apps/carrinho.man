@@ -1,0 +1,52 @@
+writeln("==============================")
+writeln("        CARRINHO DE COMPRAS   ")
+writeln("==============================")
+
+let total = 0
+let qtd_itens = 0
+
+while (1 == 1)
+begin
+    writeln("")
+    writeln("1 - Adicionar item")
+    writeln("2 - Ver total")
+    writeln("3 - Finalizar compra")
+    writeln("")
+    input("Opcao: ", op)
+
+    if (op == "1")
+    begin
+        input("Nome do item: ", item)
+        input("Preco (sem centavos): ", preco)
+        let total = total + int(preco)
+        let qtd_itens = qtd_itens + 1
+        writeln("'" + item + "' adicionado. Subtotal: R$ " + total)
+    end
+
+    if (op == "2")
+    begin
+        writeln("")
+        writeln("Itens no carrinho: " + qtd_itens)
+        writeln("Total atual:       R$ " + total)
+    end
+
+    if (op == "3")
+    begin
+        writeln("")
+        writeln("==============================")
+        writeln("      RESUMO DA COMPRA        ")
+        writeln("==============================")
+        writeln("Total de itens: " + qtd_itens)
+        writeln("Valor total:    R$ " + total)
+        writeln("")
+        input("Desconto (%): ", desc)
+        let desconto = total * int(desc) / 100
+        let final = total - desconto
+        writeln("Desconto aplicado: R$ " + desconto)
+        writeln("VALOR FINAL:       R$ " + final)
+        writeln("")
+        writeln("Compra finalizada! Obrigado!")
+        break
+    end
+
+end

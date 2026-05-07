@@ -1,0 +1,257 @@
+let px = 380
+let py = 520
+let pvel = 5
+let vivo = 1
+let pontos = 0
+
+# Bola 1
+let b1x = 100
+let b1y = 0
+let b1vel = 4
+
+# Bola 2
+let b2x = 300
+let b2y = 0
+let b2vel = 6
+
+# Bola 3
+let b3x = 600
+let b3y = 0
+let b3vel = 5
+
+# Bola 4
+let b4x = 450
+let b4y = 200
+let b4vel = 7
+
+while (vivo == 1)
+begin
+    bgcolor(10, 10, 25)
+    clear
+
+    # Fundo estrelado
+    color(40, 40, 80)
+    rect(0, 0, 800, 600)
+    color(200, 200, 255)
+    circle(50, 80, 2)
+    circle(150, 30, 2)
+    circle(300, 100, 2)
+    circle(500, 50, 2)
+    circle(650, 120, 2)
+    circle(750, 40, 2)
+    circle(200, 200, 2)
+    circle(700, 300, 2)
+
+    # Chao
+    color(30, 30, 60)
+    rect(0, 560, 800, 40)
+
+    # Le teclado
+    key(tecla)
+    if (tecla == "left")
+    begin
+        let px = px - pvel
+    end
+    if (tecla == "right")
+    begin
+        let px = px + pvel
+    end
+    if (tecla == "up")
+    begin
+        let py = py - pvel
+    end
+    if (tecla == "down")
+    begin
+        let py = py + pvel
+    end
+
+    # Limites player
+    if (px < 0)
+    begin
+        let px = 0
+    end
+    if (px > 760)
+    begin
+        let px = 760
+    end
+    if (py < 0)
+    begin
+        let py = 0
+    end
+    if (py > 540)
+    begin
+        let py = 540
+    end
+
+    # Move bola 1
+    let b1y = b1y + b1vel
+    if (b1y > 620)
+    begin
+        let b1y = 0 - 20
+        let b1x = rand(20, 760)
+    end
+
+    # Move bola 2
+    let b2y = b2y + b2vel
+    if (b2y > 620)
+    begin
+        let b2y = 0 - 20
+        let b2x = rand(20, 760)
+    end
+
+    # Move bola 3
+    let b3y = b3y + b3vel
+    if (b3y > 620)
+    begin
+        let b3y = 0 - 20
+        let b3x = rand(20, 760)
+    end
+
+    # Move bola 4
+    let b4y = b4y + b4vel
+    if (b4y > 620)
+    begin
+        let b4y = 0 - 20
+        let b4x = rand(20, 760)
+    end
+
+    # Aumenta dificuldade
+    let pontos = pontos + 1
+    if (pontos == 300)
+    begin
+        let b1vel = 6
+        let b2vel = 8
+        let b3vel = 7
+        let b4vel = 9
+    end
+    if (pontos == 700)
+    begin
+        let b1vel = 9
+        let b2vel = 11
+        let b3vel = 10
+        let b4vel = 12
+    end
+
+    # Colisao bola 1
+    let dx = px - b1x
+    let dy = py - b1y
+    if (dx < 0)
+    begin
+        let dx = 0 - dx
+    end
+    if (dy < 0)
+    begin
+        let dy = 0 - dy
+    end
+    if (dx < 30)
+    begin
+        if (dy < 30)
+        begin
+            let vivo = 0
+        end
+    end
+
+    # Colisao bola 2
+    let dx = px - b2x
+    let dy = py - b2y
+    if (dx < 0)
+    begin
+        let dx = 0 - dx
+    end
+    if (dy < 0)
+    begin
+        let dy = 0 - dy
+    end
+    if (dx < 30)
+    begin
+        if (dy < 30)
+        begin
+            let vivo = 0
+        end
+    end
+
+    # Colisao bola 3
+    let dx = px - b3x
+    let dy = py - b3y
+    if (dx < 0)
+    begin
+        let dx = 0 - dx
+    end
+    if (dy < 0)
+    begin
+        let dy = 0 - dy
+    end
+    if (dx < 30)
+    begin
+        if (dy < 30)
+        begin
+            let vivo = 0
+        end
+    end
+
+    # Colisao bola 4
+    let dx = px - b4x
+    let dy = py - b4y
+    if (dx < 0)
+    begin
+        let dx = 0 - dx
+    end
+    if (dy < 0)
+    begin
+        let dy = 0 - dy
+    end
+    if (dx < 30)
+    begin
+        if (dy < 30)
+        begin
+            let vivo = 0
+        end
+    end
+
+    # Desenha bolas
+    color(255, 80, 80)
+    circle(b1x, b1y, 18)
+    color(255, 140, 40)
+    circle(b2x, b2y, 18)
+    color(255, 60, 200)
+    circle(b3x, b3y, 18)
+    color(255, 200, 40)
+    circle(b4x, b4y, 18)
+
+    # Desenha player
+    color(40, 120, 255)
+    rect(px, py, 40, 40)
+    color(200, 230, 255)
+    rect(px + 8, py + 8, 10, 10)
+    rect(px + 22, py + 8, 10, 10)
+
+    # HUD
+    color(255, 220, 50)
+    text(10, 10, 20, "PONTOS:")
+    color(255, 255, 255)
+    text(110, 10, 20, str(pontos))
+    color(150, 150, 200)
+    text(10, 575, 14, "Setas = mover   ESC = sair")
+
+    render
+    sleep(16)
+end
+
+# GAME OVER
+bgcolor(10, 10, 25)
+clear
+color(40, 40, 80)
+rect(0, 0, 800, 600)
+color(255, 80, 80)
+text(230, 200, 48, "GAME OVER")
+color(80, 80, 120)
+line(150, 270, 650, 270)
+color(255, 220, 50)
+text(220, 300, 28, "Sua pontuacao:")
+color(255, 255, 255)
+text(470, 300, 28, str(pontos))
+color(150, 200, 255)
+text(230, 380, 20, "Uma bola te acertou!")
+color(100, 100, 150)
+text(240, 420, 16, "Feche a janela para sair")
+render

@@ -1,0 +1,605 @@
+bgcolor(5, 10, 20)
+
+let pontos = 0
+let combo = 0
+let max_combo = 0
+let vidas = 5
+let jogo_ativo = 1
+let nivel = 1
+let tick = 0
+let velocidade = 2
+let acertos = 0
+let total_oportunidades = 0
+
+# Fita esquerda 
+let fe1 = 1
+let fe2 = 2
+let fe3 = 3
+let fe4 = 4
+let fe5 = 1
+
+# Fita direita
+# 1=vermelho par com 4=amarelo, 2=azul par com 3=verde
+let fd1 = 4
+let fd2 = 3
+let fd3 = 2
+let fd4 = 1
+let fd5 = 4
+
+# Posicoes verticais das bases
+let fy1 = 0 - 80
+let fy2 = 0 - 160
+let fy3 = 0 - 240
+let fy4 = 0 - 320
+let fy5 = 0 - 400
+
+# Zona de match (centro)
+let zona_y = 250
+let zona_h = 40
+
+# Feedback
+let fb_timer = 0
+let fb_tipo = 0
+let ativado = 0
+
+# Função para cor por tipo
+# 1=vermelho, 2=azul, 3=verde, 4=amarelo
+
+while (jogo_ativo == 1)
+begin
+    clear
+
+    # Fundo
+    color(5, 10, 20)
+    rect(0, 0, 800, 600)
+
+    # Grade de fundo
+    color(10, 20, 35)
+    let gg = 0
+    while (gg < 600)
+    begin
+        line(0, gg, 800, gg)
+        gg = gg + 50
+    end
+
+    # Helice dupla de fundo 
+    color(15, 30, 50)
+    line(380, 0, 380, 600)
+    line(420, 0, 420, 600)
+
+    # Zona de alinhamento 
+    color(50, 80, 120)
+    fill off
+    rect(100, zona_y, 600, zona_h)
+    fill on
+    color(100, 150, 200)
+    line(100, zona_y + zona_h / 2, 700, zona_y + zona_h / 2)
+    color(80, 120, 180)
+    text(710, zona_y + 12, 16, "AQUI!")
+
+    # Cabos das fitas
+    color(40, 60, 100)
+    line(230, 0, 230, 600)
+    line(250, 0, 250, 600)
+    line(540, 0, 540, 600)
+    line(560, 0, 560, 600)
+
+    # Desenhar bases pares 
+    let bi = 1
+    while (bi <= 5)
+    begin
+        let by = 0
+        if (bi == 1)
+        begin
+            by = fy1
+        end
+        if (bi == 2)
+        begin
+            by = fy2
+        end
+        if (bi == 3)
+        begin
+            by = fy3
+        end
+        if (bi == 4)
+        begin
+            by = fy4
+        end
+        if (bi == 5)
+        begin
+            by = fy5
+        end
+
+        let bte = 0
+        let btd = 0
+        if (bi == 1)
+        begin
+            bte = fe1
+            btd = fd1
+        end
+        if (bi == 2)
+        begin
+            bte = fe2
+            btd = fd2
+        end
+        if (bi == 3)
+        begin
+            bte = fe3
+            btd = fd3
+        end
+        if (bi == 4)
+        begin
+            bte = fe4
+            btd = fd4
+        end
+        if (bi == 5)
+        begin
+            bte = fe5
+            btd = fd5
+        end
+
+        # Base esquerda
+        if (bte == 1)
+        begin
+            color(255, 60, 80)
+        end
+        if (bte == 2)
+        begin
+            color(60, 120, 255)
+        end
+        if (bte == 3)
+        begin
+            color(60, 220, 80)
+        end
+        if (bte == 4)
+        begin
+            color(255, 220, 50)
+        end
+        circle(240, by + zona_h / 2, 18)
+        # Letra dentro
+        color(255, 255, 255)
+        if (bte == 1)
+        begin
+            text(234, by + zona_h / 2 - 8, 16, "A")
+        end
+        if (bte == 2)
+        begin
+            text(234, by + zona_h / 2 - 8, 16, "S")
+        end
+        if (bte == 3)
+        begin
+            text(234, by + zona_h / 2 - 8, 16, "D")
+        end
+        if (bte == 4)
+        begin
+            text(234, by + zona_h / 2 - 8, 16, "W")
+        end
+
+        # Conector central
+        if (bte == 1)
+        begin
+            color(200, 50, 60)
+        end
+        if (bte == 2)
+        begin
+            color(50, 90, 200)
+        end
+        if (bte == 3)
+        begin
+            color(50, 180, 60)
+        end
+        if (bte == 4)
+        begin
+            color(200, 180, 40)
+        end
+        line(260, by + zona_h / 2, 540, by + zona_h / 2)
+        line(260, by + zona_h / 2 - 1, 540, by + zona_h / 2 - 1)
+        line(260, by + zona_h / 2 + 1, 540, by + zona_h / 2 + 1)
+
+        # Base direita 
+        if (btd == 1)
+        begin
+            color(255, 60, 80)
+        end
+        if (btd == 2)
+        begin
+            color(60, 120, 255)
+        end
+        if (btd == 3)
+        begin
+            color(60, 220, 80)
+        end
+        if (btd == 4)
+        begin
+            color(255, 220, 50)
+        end
+        circle(550, by + zona_h / 2, 18)
+        color(255, 255, 255)
+        if (btd == 1)
+        begin
+            text(544, by + zona_h / 2 - 8, 16, "A")
+        end
+        if (btd == 2)
+        begin
+            text(544, by + zona_h / 2 - 8, 16, "S")
+        end
+        if (btd == 3)
+        begin
+            text(544, by + zona_h / 2 - 8, 16, "D")
+        end
+        if (btd == 4)
+        begin
+            text(544, by + zona_h / 2 - 8, 16, "W")
+        end
+
+        # Destaque na zona de match
+        if (by >= zona_y - 20 and by <= zona_y + zona_h)
+        begin
+            if (bte == 1)
+            begin
+                color(255, 100, 120)
+            end
+            if (bte == 2)
+            begin
+                color(100, 160, 255)
+            end
+            if (bte == 3)
+            begin
+                color(100, 255, 120)
+            end
+            if (bte == 4)
+            begin
+                color(255, 255, 100)
+            end
+            fill off
+            circle(240, by + zona_h / 2, 24)
+            circle(550, by + zona_h / 2, 24)
+            fill on
+        end
+
+        bi = bi + 1
+    end
+
+    # Legenda das teclas
+    color(40, 50, 80)
+    rect(0, 520, 800, 80)
+    color(255, 60, 80)
+    circle(80, 552, 16)
+    color(255, 255, 255)
+    text(74, 544, 16, "A")
+    color(200, 200, 200)
+    text(100, 545, 15, "= vermelho")
+
+    color(60, 120, 255)
+    circle(250, 552, 16)
+    color(255, 255, 255)
+    text(244, 544, 16, "S")
+    color(200, 200, 200)
+    text(270, 545, 15, "= azul")
+
+    color(60, 220, 80)
+    circle(390, 552, 16)
+    color(255, 255, 255)
+    text(384, 544, 16, "D")
+    color(200, 200, 200)
+    text(410, 545, 15, "= verde")
+
+    color(255, 220, 50)
+    circle(530, 552, 16)
+    color(255, 255, 255)
+    text(524, 544, 16, "W")
+    color(200, 200, 200)
+    text(550, 545, 15, "= amarelo")
+
+    color(150, 150, 200)
+    text(100, 575, 14, "Pressione a tecla da BASE que esta na zona amarela!")
+
+    # Feedback visual
+    if (fb_timer > 0)
+    begin
+        if (fb_tipo == 1)
+        begin
+            color(100, 255, 100)
+            text(280, 460, 32, "PERFEITO!")
+            color(255, 200, 50)
+            text(320, 495, 18, "COMBO x")
+            text(425, 495, 18, combo)
+        end
+        if (fb_tipo == 2)
+        begin
+            color(255, 80, 50)
+            text(300, 460, 32, "ERROU!")
+            color(200, 100, 50)
+            text(285, 495, 16, "Combo perdido!")
+        end
+        if (fb_tipo == 3)
+        begin
+            color(255, 150, 50)
+            text(260, 460, 28, "Nenhuma base!")
+        end
+        fb_timer = fb_timer - 1
+    end
+
+    # HUD topo
+    color(10, 15, 35)
+    rect(0, 0, 800, 50)
+    color(100, 200, 255)
+    text(20, 12, 22, "DNA MATCH")
+    color(255, 220, 50)
+    text(220, 15, 20, "PONTOS:")
+    color(255, 255, 255)
+    text(340, 15, 20, pontos)
+    color(255, 150, 50)
+    text(430, 15, 20, "COMBO:")
+    color(255, 255, 100)
+    text(530, 15, 20, combo)
+    color(255, 80, 80)
+    let hv7 = 0
+    while (hv7 < vidas)
+    begin
+        circle(620 + hv7 * 28, 26, 9)
+        hv7 = hv7 + 1
+    end
+
+    render
+
+    # Mover fita
+    fy1 = fy1 + velocidade
+    fy2 = fy2 + velocidade
+    fy3 = fy3 + velocidade
+    fy4 = fy4 + velocidade
+    fy5 = fy5 + velocidade
+
+    # Reposicionar fita quando sai pela base
+    if (fy1 > 600)
+    begin
+        fy1 = fy5 - 80
+        fe1 = rand(1, 4)
+        if (fe1 == 1)
+        begin
+            fd1 = 4
+        end
+        if (fe1 == 2)
+        begin
+            fd1 = 3
+        end
+        if (fe1 == 3)
+        begin
+            fd1 = 2
+        end
+        if (fe1 == 4)
+        begin
+            fd1 = 1
+        end
+    end
+    if (fy2 > 600)
+    begin
+        fy2 = fy1 - 80
+        fe2 = rand(1, 4)
+        if (fe2 == 1)
+        begin
+            fd2 = 4
+        end
+        if (fe2 == 2)
+        begin
+            fd2 = 3
+        end
+        if (fe2 == 3)
+        begin
+            fd2 = 2
+        end
+        if (fe2 == 4)
+        begin
+            fd2 = 1
+        end
+    end
+    if (fy3 > 600)
+    begin
+        fy3 = fy2 - 80
+        fe3 = rand(1, 4)
+        if (fe3 == 1)
+        begin
+            fd3 = 4
+        end
+        if (fe3 == 2)
+        begin
+            fd3 = 3
+        end
+        if (fe3 == 3)
+        begin
+            fd3 = 2
+        end
+        if (fe3 == 4)
+        begin
+            fd3 = 1
+        end
+    end
+    if (fy4 > 600)
+    begin
+        fy4 = fy3 - 80
+        fe4 = rand(1, 4)
+        if (fe4 == 1)
+        begin
+            fd4 = 4
+        end
+        if (fe4 == 2)
+        begin
+            fd4 = 3
+        end
+        if (fe4 == 3)
+        begin
+            fd4 = 2
+        end
+        if (fe4 == 4)
+        begin
+            fd4 = 1
+        end
+    end
+    if (fy5 > 600)
+    begin
+        fy5 = fy4 - 80
+        fe5 = rand(1, 4)
+        if (fe5 == 1)
+        begin
+            fd5 = 4
+        end
+        if (fe5 == 2)
+        begin
+            fd5 = 3
+        end
+        if (fe5 == 3)
+        begin
+            fd5 = 2
+        end
+        if (fe5 == 4)
+        begin
+            fd5 = 1
+        end
+    end
+
+    # Detectar tecla pressionada
+    key(tecla2)
+    let tecla_val = 0
+    if (tecla2 == "a")
+    begin
+        tecla_val = 1
+    end
+    if (tecla2 == "s")
+    begin
+        tecla_val = 2
+    end
+    if (tecla2 == "d")
+    begin
+        tecla_val = 3
+    end
+    if (tecla2 == "w")
+    begin
+        tecla_val = 4
+    end
+
+    if (tecla_val > 0)
+    begin
+        # Encontrar qual base esta na zona
+        let base_na_zona = 0
+        let bi2 = 1
+        while (bi2 <= 5)
+        begin
+            let by2 = 0
+            if (bi2 == 1)
+            begin
+                by2 = fy1
+            end
+            if (bi2 == 2)
+            begin
+                by2 = fy2
+            end
+            if (bi2 == 3)
+            begin
+                by2 = fy3
+            end
+            if (bi2 == 4)
+            begin
+                by2 = fy4
+            end
+            if (bi2 == 5)
+            begin
+                by2 = fy5
+            end
+            if (by2 >= zona_y - 10 and by2 <= zona_y + zona_h + 10)
+            begin
+                let bte2 = 0
+                if (bi2 == 1)
+                begin
+                    bte2 = fe1
+                end
+                if (bi2 == 2)
+                begin
+                    bte2 = fe2
+                end
+                if (bi2 == 3)
+                begin
+                    bte2 = fe3
+                end
+                if (bi2 == 4)
+                begin
+                    bte2 = fe4
+                end
+                if (bi2 == 5)
+                begin
+                    bte2 = fe5
+                end
+                base_na_zona = bte2
+            end
+            bi2 = bi2 + 1
+        end
+
+        if (base_na_zona > 0)
+        begin
+            total_oportunidades = total_oportunidades + 1
+            if (tecla_val == base_na_zona)
+            begin
+                pontos = pontos + 10 + combo * 2
+                combo = combo + 1
+                acertos = acertos + 1
+                fb_tipo = 1
+                fb_timer = 40
+                if (combo > max_combo)
+                begin
+                    max_combo = combo
+                end
+                if (acertos >= nivel * 10)
+                begin
+                    nivel = nivel + 1
+                    velocidade = velocidade + 1
+                end
+            end
+            if (tecla_val != base_na_zona)
+            begin
+                vidas = vidas - 1
+                combo = 0
+                fb_tipo = 2
+                fb_timer = 35
+                if (vidas <= 0)
+                begin
+                    jogo_ativo = 0
+                end
+            end
+        end
+        if (base_na_zona == 0)
+        begin
+            fb_tipo = 3
+            fb_timer = 20
+        end
+    end
+
+    tick = tick + 1
+    sleep(25)
+end
+
+clear
+color(5, 10, 20)
+rect(0, 0, 800, 600)
+color(100, 255, 180)
+text(200, 150, 48, "DNA COMPLETO!")
+color(255, 220, 50)
+text(200, 250, 28, "Pontuacao Final:")
+color(255, 255, 255)
+text(310, 295, 42, pontos)
+color(255, 150, 50)
+text(200, 380, 22, "Maior Combo:")
+color(255, 255, 100)
+text(390, 380, 28, max_combo)
+color(100, 200, 255)
+text(200, 430, 22, "Acertos:")
+color(255, 255, 255)
+text(340, 430, 22, acertos)
+text(390, 430, 22, "de")
+text(430, 430, 22, total_oportunidades)
+color(100, 200, 255)
+text(200, 470, 22, "Nivel alcancado:")
+color(255, 255, 255)
+text(420, 470, 28, nivel)
+color(150, 150, 150)
+text(220, 540, 18, "Feche a janela para sair")
+render
+sleep(7000)

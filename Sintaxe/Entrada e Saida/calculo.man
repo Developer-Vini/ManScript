@@ -1,0 +1,3 @@
+let x = 7
+let y = 8
+writeln("Produto: " + str(x * y))

@@ -1,0 +1,2 @@
+input(nome)
+writeln("Olá, seja bem vindo: " + nome)

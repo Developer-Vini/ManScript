@@ -1,0 +1,184 @@
+rcsetmap(14, 14)
+
+rcwall(0, 0, 1)
+rcwall(1, 0, 1)
+rcwall(2, 0, 1)
+rcwall(3, 0, 1)
+rcwall(4, 0, 1)
+rcwall(5, 0, 1)
+rcwall(6, 0, 1)
+rcwall(7, 0, 1)
+rcwall(8, 0, 1)
+rcwall(9, 0, 1)
+rcwall(10, 0, 1)
+rcwall(11, 0, 1)
+rcwall(12, 0, 1)
+rcwall(13, 0, 1)
+
+rcwall(0, 13, 1)
+rcwall(1, 13, 1)
+rcwall(2, 13, 1)
+rcwall(3, 13, 1)
+rcwall(4, 13, 1)
+rcwall(5, 13, 1)
+rcwall(6, 13, 1)
+rcwall(7, 13, 1)
+rcwall(8, 13, 1)
+rcwall(9, 13, 1)
+rcwall(10, 13, 1)
+rcwall(11, 13, 1)
+rcwall(12, 13, 1)
+rcwall(13, 13, 1)
+
+rcwall(0, 1, 1)
+rcwall(0, 2, 1)
+rcwall(0, 3, 1)
+rcwall(0, 4, 1)
+rcwall(0, 5, 1)
+rcwall(0, 6, 1)
+rcwall(0, 7, 1)
+rcwall(0, 8, 1)
+rcwall(0, 9, 1)
+rcwall(0, 10, 1)
+rcwall(0, 11, 1)
+rcwall(0, 12, 1)
+
+rcwall(13, 1, 1)
+rcwall(13, 2, 1)
+rcwall(13, 3, 1)
+rcwall(13, 4, 1)
+rcwall(13, 5, 1)
+rcwall(13, 6, 1)
+rcwall(13, 7, 1)
+rcwall(13, 8, 1)
+rcwall(13, 9, 1)
+rcwall(13, 10, 1)
+rcwall(13, 11, 1)
+rcwall(13, 12, 1)
+
+rcwall(3, 2, 1)
+rcwall(4, 2, 1)
+rcwall(3, 3, 1)
+rcwall(3, 4, 1)
+rcwall(3, 5, 1)
+rcwall(4, 5, 1)
+
+rcwall(7, 2, 1)
+rcwall(8, 2, 1)
+rcwall(9, 2, 1)
+rcwall(7, 3, 1)
+rcwall(9, 3, 1)
+rcwall(7, 4, 1)
+
+rcwall(2, 8, 1)
+rcwall(3, 8, 1)
+rcwall(4, 8, 1)
+rcwall(5, 8, 1)
+rcwall(5, 9, 1)
+rcwall(5, 10, 1)
+
+rcwall(8, 8, 1)
+rcwall(9, 8, 1)
+rcwall(10, 8, 1)
+rcwall(10, 9, 1)
+rcwall(10, 10, 1)
+rcwall(8, 10, 1)
+rcwall(9, 10, 1)
+
+rcwall(6, 5, 1)
+rcwall(7, 5, 1)
+rcwall(6, 6, 1)
+
+rcsetceil(20, 30, 50)
+rcsetfloor(70, 55, 40)
+rcminimap(1)
+
+rcsetpos(2, 2, 1, 0)
+
+let vel = 0.07
+let pontos = 0
+let tiros = 10
+let recarga = 0
+let flash = 0
+let rodando = 1
+
+while (rodando == 1)
+begin
+    key(tecla)
+
+    if (tecla == "up")
+    begin
+        rcmove(vel)
+    end
+    if (tecla == "down")
+    begin
+        rcmove(0 - vel)
+    end
+    if (tecla == "left")
+    begin
+        rcturn(0 - 2)
+    end
+    if (tecla == "right")
+    begin
+        rcturn(2)
+    end
+    if (tecla == "a")
+    begin
+        rcstrafe(0 - vel)
+    end
+    if (tecla == "d")
+    begin
+        rcstrafe(vel)
+    end
+    if (tecla == "space")
+    begin
+        if (tiros > 0)
+        begin
+            let tiros = tiros - 1
+            let pontos = pontos + 10
+            let flash = 5
+        end
+        if (tiros == 0)
+        begin
+            let recarga = recarga + 1
+            if (recarga >= 60)
+            begin
+                let tiros = 10
+                let recarga = 0
+            end
+        end
+    end
+    if (tecla == "escape")
+    begin
+        let rodando = 0
+    end
+
+    if (flash > 0)
+    begin
+        let flash = flash - 1
+    end
+
+    rcrender
+
+    if (flash > 0)
+    begin
+        color(255, 220, 100)
+        circle(400, 300, 10)
+        color(255, 255, 0)
+        circle(400, 300, 4)
+    end
+
+    color(200, 200, 200)
+    line(390, 300, 410, 300)
+    line(400, 290, 400, 310)
+
+    color(255, 255, 255)
+    text(10, 10, 16, "PONTOS: " + str(pontos))
+    color(100, 220, 100)
+    text(300, 10, 16, "TIROS: " + str(tiros))
+    color(180, 180, 180)
+    text(10, 570, 13, "setas: mover/girar  A/D: strafe  SPACE: atirar  ESC: sair")
+
+    render
+    sleep(16)
+end

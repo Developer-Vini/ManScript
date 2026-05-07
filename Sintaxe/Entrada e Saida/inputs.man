@@ -1,0 +1,4 @@
+input("Primeiro número: ", a)
+input("Segundo número: ", b)
+let s = int(a) + int(b)
+writeln("Soma: " + str(s))

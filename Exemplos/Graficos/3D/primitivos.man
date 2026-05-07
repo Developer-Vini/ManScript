@@ -1,0 +1,72 @@
+3dinit
+3dcam(0, 2, -14, 0, 0)
+3dfov(520)
+
+3dcube("cubo", 2)
+3dcolor("cubo", 100, 180, 255)
+3dwireframe("cubo", 0)
+3dpos("cubo", -5, 0, 5)
+
+3dsphere("esfera", 1.2, 12, 20)
+3dcolor("esfera", 255, 100, 80)
+3dwireframe("esfera", 0)
+3dpos("esfera", 0, 0, 5)
+
+3dpyramid("piramide", 2, 2.5)
+3dcolor("piramide", 80, 220, 100)
+3dwireframe("piramide", 0)
+3dpos("piramide", 5, -1, 5)
+
+3dcylinder("cilindro", 0.8, 2.5, 16)
+3dcolor("cilindro", 255, 200, 50)
+3dwireframe("cilindro", 0)
+3dpos("cilindro", 0, 0, 10)
+
+3dplane("chao", 24, 24)
+3dcolor("chao", 50, 50, 80)
+3dwireframe("chao", 0)
+3dpos("chao", 0, -2, 7)
+
+let ang = 0
+let rodando = 1
+
+while (rodando == 1)
+begin
+    bgcolor(8, 8, 18)
+    clear
+
+    3drot("cubo", ang, ang, 0)
+    3drot("esfera", 0, ang, ang)
+    3drot("piramide", ang, ang, 0)
+    3drot("cilindro", 0, ang, 0)
+
+    3drender
+
+    color(255, 255, 255)
+    text(10, 10, 18, "PRIMITIVOS 3D")
+    color(100, 160, 255)
+    text(10, 35, 14, "Cubo")
+    color(255, 100, 80)
+    text(160, 35, 14, "Esfera")
+    color(80, 220, 100)
+    text(310, 35, 14, "Piramide")
+    color(255, 200, 50)
+    text(460, 35, 14, "Cilindro")
+    color(120, 120, 120)
+    text(10, 570, 13, "ESC = sair")
+
+    render
+    sleep(16)
+
+    let ang = ang + 1
+    if (ang >= 360)
+    begin
+        let ang = 0
+    end
+
+    key(tecla)
+    if (tecla == "escape")
+    begin
+        let rodando = 0
+    end
+end

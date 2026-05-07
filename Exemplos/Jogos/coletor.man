@@ -1,0 +1,418 @@
+let px = 360
+let py = 510
+let pvel = 6
+let pontos = 0
+let vidas = 5
+let rodando = 1
+
+# Itens que caem
+let i1x = rand(20, 760)
+let i1y = 0 - 20
+let i1tipo = 1
+let i1vel = 4
+
+let i2x = rand(20, 760)
+let i2y = 0 - 100
+let i2tipo = 0
+let i2vel = 5
+
+let i3x = rand(20, 760)
+let i3y = 0 - 200
+let i3tipo = 1
+let i3vel = 3
+
+let i4x = rand(20, 760)
+let i4y = 0 - 300
+let i4tipo = 0
+let i4vel = 6
+
+let i5x = rand(20, 760)
+let i5y = 0 - 400
+let i5tipo = 1
+let i5vel = 5
+
+while (rodando == 1)
+begin
+    bgcolor(10, 10, 30)
+    clear
+
+    # Ceu estrelado
+    color(30, 30, 70)
+    rect(0, 0, 800, 600)
+    color(180, 180, 255)
+    circle(80, 40, 1)
+    circle(200, 80, 1)
+    circle(400, 20, 1)
+    circle(600, 60, 1)
+    circle(720, 30, 1)
+    circle(150, 150, 1)
+    circle(550, 120, 1)
+
+    # Chao
+    color(40, 30, 20)
+    rect(0, 555, 800, 45)
+    color(60, 50, 30)
+    rect(0, 555, 800, 8)
+
+    # Teclado
+    key(tecla)
+    if (tecla == "left")
+    begin
+        let px = px - pvel
+    end
+    if (tecla == "right")
+    begin
+        let px = px + pvel
+    end
+    if (px < 0)
+    begin
+        let px = 0
+    end
+    if (px > 720)
+    begin
+        let px = 720
+    end
+
+    # Move itens
+    let i1y = i1y + i1vel
+    let i2y = i2y + i2vel
+    let i3y = i3y + i3vel
+    let i4y = i4y + i4vel
+    let i5y = i5y + i5vel
+
+    # Reseta itens que saem da tela
+    if (i1y > 560)
+    begin
+        let i1y = 0 - 20
+        let i1x = rand(20, 760)
+        let i1tipo = rand(0, 1)
+    end
+    if (i2y > 560)
+    begin
+        let i2y = 0 - 20
+        let i2x = rand(20, 760)
+        let i2tipo = rand(0, 1)
+    end
+    if (i3y > 560)
+    begin
+        let i3y = 0 - 20
+        let i3x = rand(20, 760)
+        let i3tipo = rand(0, 1)
+    end
+    if (i4y > 560)
+    begin
+        let i4y = 0 - 20
+        let i4x = rand(20, 760)
+        let i4tipo = rand(0, 1)
+    end
+    if (i5y > 560)
+    begin
+        let i5y = 0 - 20
+        let i5x = rand(20, 760)
+        let i5tipo = rand(0, 1)
+    end
+
+    # Colisao item 1
+    let ddx = px + 40 - i1x
+    let ddy = py + 20 - i1y
+    if (ddx < 0)
+    begin
+        let ddx = 0 - ddx
+    end
+    if (ddy < 0)
+    begin
+        let ddy = 0 - ddy
+    end
+    if (ddx < 45)
+    begin
+        if (ddy < 25)
+        begin
+            if (i1tipo == 1)
+            begin
+                let pontos = pontos + 10
+            end
+            if (i1tipo == 0)
+            begin
+                let vidas = vidas - 1
+            end
+            let i1y = 0 - 20
+            let i1x = rand(20, 760)
+            let i1tipo = rand(0, 1)
+        end
+    end
+
+    # Colisao item 2
+    let ddx = px + 40 - i2x
+    let ddy = py + 20 - i2y
+    if (ddx < 0)
+    begin
+        let ddx = 0 - ddx
+    end
+    if (ddy < 0)
+    begin
+        let ddy = 0 - ddy
+    end
+    if (ddx < 45)
+    begin
+        if (ddy < 25)
+        begin
+            if (i2tipo == 1)
+            begin
+                let pontos = pontos + 10
+            end
+            if (i2tipo == 0)
+            begin
+                let vidas = vidas - 1
+            end
+            let i2y = 0 - 20
+            let i2x = rand(20, 760)
+            let i2tipo = rand(0, 1)
+        end
+    end
+
+    # Colisao item 3
+    let ddx = px + 40 - i3x
+    let ddy = py + 20 - i3y
+    if (ddx < 0)
+    begin
+        let ddx = 0 - ddx
+    end
+    if (ddy < 0)
+    begin
+        let ddy = 0 - ddy
+    end
+    if (ddx < 45)
+    begin
+        if (ddy < 25)
+        begin
+            if (i3tipo == 1)
+            begin
+                let pontos = pontos + 10
+            end
+            if (i3tipo == 0)
+            begin
+                let vidas = vidas - 1
+            end
+            let i3y = 0 - 20
+            let i3x = rand(20, 760)
+            let i3tipo = rand(0, 1)
+        end
+    end
+
+    # Colisao item 4
+    let ddx = px + 40 - i4x
+    let ddy = py + 20 - i4y
+    if (ddx < 0)
+    begin
+        let ddx = 0 - ddx
+    end
+    if (ddy < 0)
+    begin
+        let ddy = 0 - ddy
+    end
+    if (ddx < 45)
+    begin
+        if (ddy < 25)
+        begin
+            if (i4tipo == 1)
+            begin
+                let pontos = pontos + 10
+            end
+            if (i4tipo == 0)
+            begin
+                let vidas = vidas - 1
+            end
+            let i4y = 0 - 20
+            let i4x = rand(20, 760)
+            let i4tipo = rand(0, 1)
+        end
+    end
+
+    # Colisao item 5
+    let ddx = px + 40 - i5x
+    let ddy = py + 20 - i5y
+    if (ddx < 0)
+    begin
+        let ddx = 0 - ddx
+    end
+    if (ddy < 0)
+    begin
+        let ddy = 0 - ddy
+    end
+    if (ddx < 45)
+    begin
+        if (ddy < 25)
+        begin
+            if (i5tipo == 1)
+            begin
+                let pontos = pontos + 10
+            end
+            if (i5tipo == 0)
+            begin
+                let vidas = vidas - 1
+            end
+            let i5y = 0 - 20
+            let i5x = rand(20, 760)
+            let i5tipo = rand(0, 1)
+        end
+    end
+
+    if (vidas < 1)
+    begin
+        let rodando = 0
+    end
+
+    # Desenha item 1
+    if (i1tipo == 1)
+    begin
+        color(255, 220, 40)
+        circle(i1x, i1y, 14)
+        color(255, 255, 150)
+        circle(i1x - 3, i1y - 3, 5)
+    end
+    if (i1tipo == 0)
+    begin
+        color(180, 60, 60)
+        circle(i1x, i1y, 14)
+        color(255, 255, 255)
+        circle(i1x - 4, i1y - 3, 4)
+        circle(i1x + 4, i1y - 3, 4)
+        color(180, 60, 60)
+        circle(i1x - 4, i1y - 3, 2)
+        circle(i1x + 4, i1y - 3, 2)
+        color(255, 255, 255)
+        line(i1x - 5, i1y + 4, i1x + 5, i1y + 4)
+    end
+
+    # Desenha item 2
+    if (i2tipo == 1)
+    begin
+        color(255, 220, 40)
+        circle(i2x, i2y, 14)
+        color(255, 255, 150)
+        circle(i2x - 3, i2y - 3, 5)
+    end
+    if (i2tipo == 0)
+    begin
+        color(180, 60, 60)
+        circle(i2x, i2y, 14)
+        color(255, 255, 255)
+        circle(i2x - 4, i2y - 3, 4)
+        circle(i2x + 4, i2y - 3, 4)
+        color(180, 60, 60)
+        circle(i2x - 4, i2y - 3, 2)
+        circle(i2x + 4, i2y - 3, 2)
+        color(255, 255, 255)
+        line(i2x - 5, i2y + 4, i2x + 5, i2y + 4)
+    end
+
+    # Desenha item 3
+    if (i3tipo == 1)
+    begin
+        color(255, 220, 40)
+        circle(i3x, i3y, 14)
+        color(255, 255, 150)
+        circle(i3x - 3, i3y - 3, 5)
+    end
+    if (i3tipo == 0)
+    begin
+        color(180, 60, 60)
+        circle(i3x, i3y, 14)
+        color(255, 255, 255)
+        circle(i3x - 4, i3y - 3, 4)
+        circle(i3x + 4, i3y - 3, 4)
+        color(180, 60, 60)
+        circle(i3x - 4, i3y - 3, 2)
+        circle(i3x + 4, i3y - 3, 2)
+        color(255, 255, 255)
+        line(i3x - 5, i3y + 4, i3x + 5, i3y + 4)
+    end
+
+    # Desenha item 4
+    if (i4tipo == 1)
+    begin
+        color(255, 220, 40)
+        circle(i4x, i4y, 14)
+        color(255, 255, 150)
+        circle(i4x - 3, i4y - 3, 5)
+    end
+    if (i4tipo == 0)
+    begin
+        color(180, 60, 60)
+        circle(i4x, i4y, 14)
+        color(255, 255, 255)
+        circle(i4x - 4, i4y - 3, 4)
+        circle(i4x + 4, i4y - 3, 4)
+        color(180, 60, 60)
+        circle(i4x - 4, i4y - 3, 2)
+        circle(i4x + 4, i4y - 3, 2)
+        color(255, 255, 255)
+        line(i4x - 5, i4y + 4, i4x + 5, i4y + 4)
+    end
+
+    # Desenha item 5
+    if (i5tipo == 1)
+    begin
+        color(255, 220, 40)
+        circle(i5x, i5y, 14)
+        color(255, 255, 150)
+        circle(i5x - 3, i5y - 3, 5)
+    end
+    if (i5tipo == 0)
+    begin
+        color(180, 60, 60)
+        circle(i5x, i5y, 14)
+        color(255, 255, 255)
+        circle(i5x - 4, i5y - 3, 4)
+        circle(i5x + 4, i5y - 3, 4)
+        color(180, 60, 60)
+        circle(i5x - 4, i5y - 3, 2)
+        circle(i5x + 4, i5y - 3, 2)
+        color(255, 255, 255)
+        line(i5x - 5, i5y + 4, i5x + 5, i5y + 4)
+    end
+
+    # Cesto (player)
+    color(160, 100, 40)
+    rect(px, py, 80, 10)
+    rect(px, py, 8, 40)
+    rect(px + 72, py, 8, 40)
+    color(200, 140, 60)
+    rect(px + 2, py + 2, 76, 6)
+
+    # Vidas como coracoes
+    color(255, 80, 80)
+    let hx = 10
+    let hi = 0
+    while (hi < vidas)
+    begin
+        circle(hx, 575, 8)
+        let hx = hx + 22
+        let hi = hi + 1
+    end
+
+    # HUD
+    color(255, 220, 50)
+    text(340, 568, 18, "PONTOS:")
+    color(255, 255, 255)
+    text(445, 568, 18, str(pontos))
+
+    render
+    sleep(16)
+end
+
+bgcolor(10, 10, 30)
+clear
+color(20, 20, 60)
+rect(0, 0, 800, 600)
+color(255, 80, 80)
+text(230, 200, 48, "GAME OVER")
+color(255, 220, 50)
+text(220, 300, 28, "Pontuacao final:")
+color(255, 255, 255)
+text(460, 300, 28, str(pontos))
+color(180, 100, 100)
+text(200, 380, 18, "Pegou caveiras demais!")
+color(100, 100, 150)
+text(240, 430, 16, "Feche a janela para sair")
+render

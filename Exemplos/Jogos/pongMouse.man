@@ -1,0 +1,144 @@
+bgcolor(0, 0, 0)
+
+let bx = 400
+let by = 300
+let bvx = 4
+let bvy = 3
+
+let p1y = 250
+let p2y = 250
+let pw = 12
+let ph = 80
+let p1x = 20
+let p2x = 768
+
+let s1 = 0
+let s2 = 0
+
+let running = 1
+
+while (running == 1)
+begin
+    clear
+
+    # ── input ──────────────────────────────
+    mouse_update
+    key(k)
+
+    # jogador 1: W/S
+    if (k == "w")
+    begin
+        let p1y = p1y - 6
+    end
+    if (k == "s")
+    begin
+        let p1y = p1y + 6
+    end
+
+    # jogador 2: mouse
+    let p2y = mouse_y - 40
+
+    # clamp paletas
+    if (p1y < 0)
+    begin
+        let p1y = 0
+    end
+    if (p1y > 520)
+    begin
+        let p1y = 520
+    end
+    if (p2y < 0)
+    begin
+        let p2y = 0
+    end
+    if (p2y > 520)
+    begin
+        let p2y = 520
+    end
+
+    # ── mover bola ─────────────────────────
+    let bx = bx + bvx
+    let by = by + bvy
+
+    # paredes top/bottom
+    if (by < 8)
+    begin
+        let bvy = 0 - bvy
+        let by = 8
+    end
+    if (by > 592)
+    begin
+        let bvy = 0 - bvy
+        let by = 592
+    end
+
+    # colisão paleta 1
+    sprite(bx, by, 10, 10, "bola")
+    sprite(p1x, p1y, pw, ph, "pal1")
+    sprite(p2x, p2y, pw, ph, "pal2")
+
+    let h1 = collide(bola, pal1)
+    if (h1 == 1)
+    begin
+        let bvx = 0 - bvx
+        let bx = p1x + pw + 1
+    end
+
+    let h2 = collide(bola, pal2)
+    if (h2 == 1)
+    begin
+        let bvx = 0 - bvx
+        let bx = p2x - 11
+    end
+
+    # ponto
+    if (bx < 0)
+    begin
+        let s2 = s2 + 1
+        let bx = 400
+        let by = 300
+        let bvx = 4
+        let bvy = 3
+    end
+    if (bx > 800)
+    begin
+        let s1 = s1 + 1
+        let bx = 400
+        let by = 300
+        let bvx = 0 - 4
+        let bvy = 3
+    end
+
+    # ── desenho ────────────────────────────
+    # linha central pontilhada
+    color(60, 60, 60)
+    let ly = 0
+    while (ly < 600)
+    begin
+        rect(396, ly, 8, 14)
+        let ly = ly + 24
+    end
+
+    # paletas
+    color(255, 255, 255)
+    fill on
+    rect(p1x, p1y, pw, ph)
+    rect(p2x, p2y, pw, ph)
+
+    # bola
+    circle(bx, by, 8)
+
+    # placar
+    color(220, 220, 220)
+    let sc1 = str(s1)
+    let sc2 = str(s2)
+    text(320, 20, 40, sc1)
+    text(450, 20, 40, sc2)
+
+    # instruções
+    color(100, 100, 100)
+    text(10, 575, 14, "J1: W/S    J2: Mouse")
+
+    render
+    sleep(16)
+end

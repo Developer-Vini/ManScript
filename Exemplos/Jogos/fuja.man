@@ -1,0 +1,161 @@
+let px = 370
+let py = 270
+let pvel = 4
+let ex = 50
+let ey = 50
+let evel = 2
+let pontos = 0
+let vivo = 1
+
+while (vivo == 1)
+begin
+    bgcolor(15, 15, 30)
+    clear
+
+    color(25, 25, 50)
+    line(0, 200, 800, 200)
+    line(0, 400, 800, 400)
+    line(200, 0, 200, 600)
+    line(400, 0, 400, 600)
+    line(600, 0, 600, 600)
+
+    key(tecla)
+    if (tecla == "left")
+    begin
+        let px = px - pvel
+    end
+    if (tecla == "right")
+    begin
+        let px = px + pvel
+    end
+    if (tecla == "up")
+    begin
+        let py = py - pvel
+    end
+    if (tecla == "down")
+    begin
+        let py = py + pvel
+    end
+
+    if (px < 0)
+    begin
+        let px = 0
+    end
+    if (px > 764)
+    begin
+        let px = 764
+    end
+    if (py < 0)
+    begin
+        let py = 0
+    end
+    if (py > 564)
+    begin
+        let py = 564
+    end
+
+    if (ex < px)
+    begin
+        let ex = ex + evel
+    end
+    if (ex > px)
+    begin
+        let ex = ex - evel
+    end
+    if (ey < py)
+    begin
+        let ey = ey + evel
+    end
+    if (ey > py)
+    begin
+        let ey = ey - evel
+    end
+
+    let dx = px - ex
+    let dy = py - ey
+    if (dx < 0)
+    begin
+        let dx = 0 - dx
+    end
+    if (dy < 0)
+    begin
+        let dy = 0 - dy
+    end
+    if (dx < 36)
+    begin
+        if (dy < 36)
+        begin
+            let vivo = 0
+        end
+    end
+
+    let pontos = pontos + 1
+    if (pontos == 200)
+    begin
+        let evel = 3
+    end
+    if (pontos == 500)
+    begin
+        let evel = 4
+    end
+    if (pontos == 900)
+    begin
+        let evel = 5
+    end
+
+    color(120, 0, 0)
+    rect(ex + 4, ey + 4, 36, 36)
+    color(220, 40, 40)
+    rect(ex, ey, 36, 36)
+    color(255, 255, 255)
+    rect(ex + 6, ey + 8, 8, 8)
+    rect(ex + 22, ey + 8, 8, 8)
+    color(0, 0, 0)
+    rect(ex + 9, ey + 11, 4, 4)
+    rect(ex + 25, ey + 11, 4, 4)
+    color(255, 255, 255)
+    line(ex + 8, ey + 26, ex + 14, ey + 22)
+    line(ex + 14, ey + 22, ex + 22, ey + 22)
+    line(ex + 22, ey + 22, ex + 28, ey + 26)
+
+    color(0, 60, 120)
+    rect(px + 4, py + 4, 36, 36)
+    color(60, 140, 255)
+    rect(px, py, 36, 36)
+    color(255, 255, 255)
+    rect(px + 6, py + 8, 8, 8)
+    rect(px + 22, py + 8, 8, 8)
+    color(0, 0, 0)
+    rect(px + 9, py + 11, 4, 4)
+    rect(px + 25, py + 11, 4, 4)
+    color(255, 255, 255)
+    line(px + 8, py + 22, px + 14, py + 26)
+    line(px + 14, py + 26, px + 22, py + 26)
+    line(px + 22, py + 26, px + 28, py + 22)
+
+    color(255, 220, 50)
+    text(10, 10, 20, "PONTOS:")
+    color(255, 255, 255)
+    text(105, 10, 20, pontos)
+    color(180, 180, 180)
+    text(10, 570, 14, "Setas = mover   ESC = sair")
+
+    render
+    sleep(16)
+end
+
+bgcolor(15, 15, 30)
+clear
+color(220, 40, 40)
+text(220, 180, 48, "GAME OVER")
+color(80, 80, 80)
+line(150, 250, 650, 250)
+color(255, 220, 50)
+text(220, 280, 28, "Sua pontuacao:")
+color(255, 255, 255)
+text(460, 280, 28, pontos)
+color(150, 200, 255)
+text(200, 360, 20, "O inimigo te pegou!")
+color(120, 120, 120)
+text(230, 400, 16, "Feche a janela para sair")
+render

@@ -1,0 +1,197 @@
+let raq1y = 250
+let raq2y = 250
+let rvel = 6
+
+let bx = 400
+let by = 300
+let bvx = 5
+let bvy = 4
+
+let p1 = 0
+let p2 = 0
+let rodando = 1
+
+while (rodando == 1)
+begin
+    bgcolor(0, 0, 0)
+    clear
+
+    # Linha central
+    color(50, 50, 50)
+    rect(398, 0, 4, 600)
+
+    # Pontos no centro
+    color(80, 80, 80)
+    circle(400, 30, 2)
+    circle(400, 90, 2)
+    circle(400, 150, 2)
+    circle(400, 210, 2)
+    circle(400, 270, 2)
+    circle(400, 330, 2)
+    circle(400, 390, 2)
+    circle(400, 450, 2)
+    circle(400, 510, 2)
+    circle(400, 570, 2)
+
+    # Teclado
+    key(tecla)
+    if (tecla == "w")
+    begin
+        let raq1y = raq1y - rvel
+    end
+    if (tecla == "s")
+    begin
+        let raq1y = raq1y + rvel
+    end
+    if (tecla == "up")
+    begin
+        let raq2y = raq2y - rvel
+    end
+    if (tecla == "down")
+    begin
+        let raq2y = raq2y + rvel
+    end
+
+    # Limites raquetes
+    if (raq1y < 0)
+    begin
+        let raq1y = 0
+    end
+    if (raq1y > 500)
+    begin
+        let raq1y = 500
+    end
+    if (raq2y < 0)
+    begin
+        let raq2y = 0
+    end
+    if (raq2y > 500)
+    begin
+        let raq2y = 500
+    end
+
+    # Move bola
+    let bx = bx + bvx
+    let by = by + bvy
+
+    # Bate teto/chao
+    if (by < 10)
+    begin
+        let bvy = 0 - bvy
+        let by = 10
+    end
+    if (by > 590)
+    begin
+        let bvy = 0 - bvy
+        let by = 590
+    end
+
+    # Bate raquete 1 (esquerda)
+    let dy = by - raq1y
+    if (dy < 0)
+    begin
+        let dy = 0 - dy
+    end
+    if (bx < 36)
+    begin
+        if (bx > 20)
+        begin
+            if (dy < 60)
+            begin
+                let bvx = 0 - bvx
+                let bx = 36
+            end
+        end
+    end
+
+    # Bate raquete 2 (direita)
+    let dy = by - raq2y
+    if (dy < 0)
+    begin
+        let dy = 0 - dy
+    end
+    if (bx > 764)
+    begin
+        if (bx < 780)
+        begin
+            if (dy < 60)
+            begin
+                let bvx = 0 - bvx
+                let bx = 764
+            end
+        end
+    end
+
+    # Ponto J2 (bola saiu pela esquerda)
+    if (bx < 0)
+    begin
+        let p2 = p2 + 1
+        let bx = 400
+        let by = 300
+        let bvx = 5
+        let bvy = 4
+    end
+
+    # Ponto J1 (bola saiu pela direita)
+    if (bx > 800)
+    begin
+        let p1 = p1 + 1
+        let bx = 400
+        let by = 300
+        let bvx = 0 - 5
+        let bvy = 4
+    end
+
+    # Fim de jogo
+    if (p1 == 7)
+    begin
+        let rodando = 0
+    end
+    if (p2 == 7)
+    begin
+        let rodando = 0
+    end
+
+    # Desenha raquetes
+    color(255, 255, 255)
+    rect(20, raq1y, 16, 100)
+    rect(764, raq2y, 16, 100)
+
+    # Desenha bola
+    color(255, 255, 100)
+    circle(bx, by, 10)
+
+    # Placar
+    color(255, 255, 255)
+    text(300, 20, 36, str(p1))
+    text(460, 20, 36, str(p2))
+
+    color(150, 150, 150)
+    text(30, 575, 14, "J1: W/S")
+    text(680, 575, 14, "J2: Setas")
+
+    render
+    sleep(16)
+end
+
+# VENCEDOR
+bgcolor(0, 0, 0)
+clear
+color(50, 50, 50)
+rect(0, 0, 800, 600)
+color(255, 220, 50)
+text(230, 180, 42, "FIM DE JOGO!")
+color(255, 255, 255)
+if (p1 == 7)
+begin
+    text(220, 280, 32, "Jogador 1 venceu!")
+end
+if (p2 == 7)
+begin
+    text(220, 280, 32, "Jogador 2 venceu!")
+end
+color(150, 200, 255)
+text(280, 360, 24, str(p1) + "  x  " + str(p2))
+color(100, 100, 150)
+text(240, 430, 16, "Feche a janela para sair")
+render

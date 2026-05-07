@@ -1,0 +1,2 @@
+input("Digite seu nome: ", n)
+writeln("Bem-vindo, " + n + "!")

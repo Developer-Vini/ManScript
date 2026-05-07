@@ -1,0 +1,164 @@
+let cx = 20
+let cy = 15
+let dx = 1
+let dy = 0
+let vivo = 1
+let pontos = 0
+let tam = 4
+
+let s0x = 20
+let s0y = 15
+let s1x = 19
+let s1y = 15
+let s2x = 18
+let s2y = 15
+let s3x = 17
+let s3y = 15
+
+let fx = rand(2, 38)
+let fy = rand(2, 28)
+let timer = 0
+let vel = 8
+while (vivo == 1)
+begin
+    bgcolor(10, 20, 10)
+    clear
+    color(30, 100, 30)
+    rect(0, 0, 800, 20)
+    rect(0, 580, 800, 20)
+    rect(0, 0, 20, 600)
+    rect(780, 0, 20, 600)
+    key(tecla)
+    if (tecla == "left")
+    begin
+        if (dx == 0)
+        begin
+            let dx = 0 - 1
+            let dy = 0
+        end
+    end
+    if (tecla == "right")
+    begin
+        if (dx == 0)
+        begin
+            let dx = 1
+            let dy = 0
+        end
+    end
+    if (tecla == "up")
+    begin
+        if (dy == 0)
+        begin
+            let dx = 0
+            let dy = 0 - 1
+        end
+    end
+    if (tecla == "down")
+    begin
+        if (dy == 0)
+        begin
+            let dx = 0
+            let dy = 1
+        end
+    end
+    let timer = timer + 1
+    if (timer >= vel)
+    begin
+        let timer = 0
+
+        let s3x = s2x
+        let s3y = s2y
+        let s2x = s1x
+        let s2y = s1y
+        let s1x = s0x
+        let s1y = s0y
+        let s0x = cx
+        let s0y = cy
+
+        let cx = cx + dx
+        let cy = cy + dy
+        if (cx < 1)
+        begin
+            let vivo = 0
+        end
+        if (cx > 38)
+        begin
+            let vivo = 0
+        end
+        if (cy < 1)
+        begin
+            let vivo = 0
+        end
+        if (cy > 28)
+        begin
+            let vivo = 0
+        end
+        let ex = cx - fx
+        let ey = cy - fy
+        if (ex < 0)
+        begin
+            let ex = 0 - ex
+        end
+        if (ey < 0)
+        begin
+            let ey = 0 - ey
+        end
+        if (ex < 1)
+        begin
+            if (ey < 1)
+            begin
+                let pontos = pontos + 10
+                let fx = rand(2, 38)
+                let fy = rand(2, 28)
+                if (vel > 3)
+                begin
+                    let vel = vel - 1
+                end
+            end
+        end
+    end
+    color(255, 60, 60)
+    circle(fx * 20, fy * 20, 8)
+    color(255, 180, 180)
+    circle(fx * 20 - 2, fy * 20 - 2, 3)
+    color(40, 200, 40)
+    rect(s3x * 20 - 8, s3y * 20 - 8, 16, 16)
+    color(60, 220, 60)
+    rect(s2x * 20 - 8, s2y * 20 - 8, 16, 16)
+    color(80, 230, 80)
+    rect(s1x * 20 - 8, s1y * 20 - 8, 16, 16)
+    color(100, 240, 100)
+    rect(s0x * 20 - 8, s0y * 20 - 8, 16, 16)
+    color(150, 255, 100)
+    rect(cx * 20 - 9, cy * 20 - 9, 18, 18)
+    color(0, 0, 0)
+    circle(cx * 20 - 2, cy * 20 - 2, 3)
+    circle(cx * 20 + 4, cy * 20 - 2, 3)
+    color(100, 200, 100)
+    text(25, 2, 16, "SNAKE")
+    color(255, 220, 50)
+    text(300, 2, 16, "PONTOS:")
+    color(255, 255, 255)
+    text(400, 2, 16, pontos)
+    color(150, 150, 150)
+    text(560, 2, 14, "ESC = sair")
+    render
+    sleep(16)
+end
+bgcolor(10, 20, 10)
+clear
+color(20, 80, 20)
+rect(0, 0, 800, 600)
+color(60, 220, 60)
+text(240, 200, 48, "GAME OVER")
+color(80, 80, 80)
+line(150, 270, 650, 270)
+color(255, 220, 50)
+text(220, 300, 28, "Pontuacao final:")
+color(255, 255, 255)
+text(460, 300, 28, pontos)
+color(100, 180, 100)
+text(220, 380, 18, "A cobra bateu na parede!")
+color(80, 80, 100)
+text(240, 430, 16, "Feche a janela para sair")
+render

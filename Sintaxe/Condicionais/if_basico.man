@@ -1,0 +1,5 @@
+let x = 10
+if (x > 5)
+begin
+  writeln("Maior que 5")
+end

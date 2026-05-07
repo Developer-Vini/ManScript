@@ -1,0 +1,59 @@
+writeln("==============================")
+writeln("     TABUADA INTERATIVA       ")
+writeln("==============================")
+
+let acertos = 0
+let erros = 0
+let rodadas = 0
+
+input("Quantas perguntas? ", total)
+
+while (rodadas < int(total))
+begin
+    let a = rand(1, 10)
+    let b = rand(1, 10)
+    let correto = a * b
+
+    writeln("")
+    writeln("Pergunta " + (rodadas + 1) + " de " + total)
+    input(a + " x " + b + " = ", resp)
+
+    if (int(resp) == correto)
+    begin
+        writeln("CORRETO!")
+        let acertos = acertos + 1
+    end
+    if (int(resp) != correto)
+    begin
+        writeln("ERRADO! A resposta era: " + correto)
+        let erros = erros + 1
+    end
+
+    let rodadas = rodadas + 1
+end
+
+writeln("")
+writeln("==============================")
+writeln("        RESULTADO FINAL       ")
+writeln("==============================")
+writeln("Acertos: " + acertos)
+writeln("Erros:   " + erros)
+let pct = acertos * 100 / int(total)
+writeln("Aproveitamento: " + pct + "%")
+writeln("")
+
+if (pct >= 80)
+begin
+    writeln("Excelente! Continue assim!")
+end
+if (pct >= 50)
+begin
+    if (pct < 80)
+    begin
+        writeln("Bom! Mas pode melhorar!")
+    end
+end
+if (pct < 50)
+begin
+    writeln("Precisa estudar mais a tabuada!")
+end

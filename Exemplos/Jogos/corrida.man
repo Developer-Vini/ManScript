@@ -1,0 +1,295 @@
+let px = 370
+let py = 460
+let pvel = 6
+let pontos = 0
+let rodando = 1
+let vel = 5
+
+# Carros inimigos em 4 faixas
+let c1x = 160
+let c1y = 0 - 80
+let c1vel = 5
+
+let c2x = 280
+let c2y = 0 - 250
+let c2vel = 6
+
+let c3x = 400
+let c3y = 0 - 150
+let c3vel = 5
+
+let c4x = 520
+let c4y = 0 - 350
+let c4vel = 7
+
+# Linha da pista rolando
+let liny = 0
+
+while (rodando == 1)
+begin
+    bgcolor(40, 40, 40)
+    clear
+
+    # Pista
+    color(60, 60, 60)
+    rect(120, 0, 560, 600)
+
+    # Acostamento
+    color(80, 120, 40)
+    rect(0, 0, 120, 600)
+    rect(680, 0, 120, 600)
+
+    # Faixas laterais
+    color(255, 255, 255)
+    rect(120, 0, 8, 600)
+    rect(672, 0, 8, 600)
+
+    # Linhas da pista rolando
+    color(255, 220, 0)
+    let liny = liny + vel
+    if (liny > 80)
+    begin
+        let liny = 0
+    end
+    let ly = liny
+    while (ly < 640)
+    begin
+        rect(275, ly, 8, 40)
+        rect(395, ly, 8, 40)
+        rect(515, ly, 8, 40)
+        let ly = ly + 80
+    end
+
+    # Teclado
+    key(tecla)
+    if (tecla == "left")
+    begin
+        let px = px - pvel
+    end
+    if (tecla == "right")
+    begin
+        let px = px + pvel
+    end
+    if (px < 128)
+    begin
+        let px = 128
+    end
+    if (px > 616)
+    begin
+        let px = 616
+    end
+
+    # Move carros inimigos
+    let c1y = c1y + c1vel
+    let c2y = c2y + c2vel
+    let c3y = c3y + c3vel
+    let c4y = c4y + c4vel
+
+    if (c1y > 620)
+    begin
+        let c1y = 0 - 80
+        let c1x = rand(130, 620)
+        let pontos = pontos + 5
+    end
+    if (c2y > 620)
+    begin
+        let c2y = 0 - 80
+        let c2x = rand(130, 620)
+        let pontos = pontos + 5
+    end
+    if (c3y > 620)
+    begin
+        let c3y = 0 - 80
+        let c3x = rand(130, 620)
+        let pontos = pontos + 5
+    end
+    if (c4y > 620)
+    begin
+        let c4y = 0 - 80
+        let c4x = rand(130, 620)
+        let pontos = pontos + 5
+    end
+
+    # Aumenta dificuldade
+    if (pontos == 50)
+    begin
+        let c1vel = 7
+        let c2vel = 8
+        let c3vel = 7
+        let c4vel = 9
+        let vel = 7
+    end
+    if (pontos == 120)
+    begin
+        let c1vel = 10
+        let c2vel = 11
+        let c3vel = 10
+        let c4vel = 12
+        let vel = 10
+    end
+
+    # Colisao carro 1
+    let ddx = px - c1x
+    let ddy = py - c1y
+    if (ddx < 0)
+    begin
+        let ddx = 0 - ddx
+    end
+    if (ddy < 0)
+    begin
+        let ddy = 0 - ddy
+    end
+    if (ddx < 44)
+    begin
+        if (ddy < 48)
+        begin
+            let rodando = 0
+        end
+    end
+
+    # Colisao carro 2
+    let ddx = px - c2x
+    let ddy = py - c2y
+    if (ddx < 0)
+    begin
+        let ddx = 0 - ddx
+    end
+    if (ddy < 0)
+    begin
+        let ddy = 0 - ddy
+    end
+    if (ddx < 44)
+    begin
+        if (ddy < 48)
+        begin
+            let rodando = 0
+        end
+    end
+
+    # Colisao carro 3
+    let ddx = px - c3x
+    let ddy = py - c3y
+    if (ddx < 0)
+    begin
+        let ddx = 0 - ddx
+    end
+    if (ddy < 0)
+    begin
+        let ddy = 0 - ddy
+    end
+    if (ddx < 44)
+    begin
+        if (ddy < 48)
+        begin
+            let rodando = 0
+        end
+    end
+
+    # Colisao carro 4
+    let ddx = px - c4x
+    let ddy = py - c4y
+    if (ddx < 0)
+    begin
+        let ddx = 0 - ddx
+    end
+    if (ddy < 0)
+    begin
+        let ddy = 0 - ddy
+    end
+    if (ddx < 44)
+    begin
+        if (ddy < 48)
+        begin
+            let rodando = 0
+        end
+    end
+
+    # Desenha carros inimigos
+    color(220, 40, 40)
+    rect(c1x - 20, c1y, 40, 70)
+    color(255, 80, 80)
+    rect(c1x - 14, c1y + 8, 28, 18)
+    rect(c1x - 14, c1y + 40, 28, 18)
+    color(30, 30, 30)
+    rect(c1x - 20, c1y + 10, 8, 14)
+    rect(c1x + 12, c1y + 10, 8, 14)
+    rect(c1x - 20, c1y + 46, 8, 14)
+    rect(c1x + 12, c1y + 46, 8, 14)
+
+    color(220, 40, 40)
+    rect(c2x - 20, c2y, 40, 70)
+    color(255, 80, 80)
+    rect(c2x - 14, c2y + 8, 28, 18)
+    rect(c2x - 14, c2y + 40, 28, 18)
+    color(30, 30, 30)
+    rect(c2x - 20, c2y + 10, 8, 14)
+    rect(c2x + 12, c2y + 10, 8, 14)
+    rect(c2x - 20, c2y + 46, 8, 14)
+    rect(c2x + 12, c2y + 46, 8, 14)
+
+    color(40, 100, 220)
+    rect(c3x - 20, c3y, 40, 70)
+    color(80, 140, 255)
+    rect(c3x - 14, c3y + 8, 28, 18)
+    rect(c3x - 14, c3y + 40, 28, 18)
+    color(30, 30, 30)
+    rect(c3x - 20, c3y + 10, 8, 14)
+    rect(c3x + 12, c3y + 10, 8, 14)
+    rect(c3x - 20, c3y + 46, 8, 14)
+    rect(c3x + 12, c3y + 46, 8, 14)
+
+    color(40, 180, 40)
+    rect(c4x - 20, c4y, 40, 70)
+    color(80, 220, 80)
+    rect(c4x - 14, c4y + 8, 28, 18)
+    rect(c4x - 14, c4y + 40, 28, 18)
+    color(30, 30, 30)
+    rect(c4x - 20, c4y + 10, 8, 14)
+    rect(c4x + 12, c4y + 10, 8, 14)
+    rect(c4x - 20, c4y + 46, 8, 14)
+    rect(c4x + 12, c4y + 46, 8, 14)
+
+    # Carro do player (azul claro)
+    color(100, 200, 255)
+    rect(px - 20, py, 40, 70)
+    color(180, 240, 255)
+    rect(px - 14, py + 8, 28, 18)
+    rect(px - 14, py + 40, 28, 18)
+    color(255, 255, 100)
+    circle(px - 14, py + 2, 5)
+    circle(px + 14, py + 2, 5)
+    color(30, 30, 30)
+    rect(px - 20, py + 10, 8, 14)
+    rect(px + 12, py + 10, 8, 14)
+    rect(px - 20, py + 46, 8, 14)
+    rect(px + 12, py + 46, 8, 14)
+
+    # HUD
+    color(255, 220, 50)
+    text(10, 10, 20, "PONTOS:")
+    color(255, 255, 255)
+    text(110, 10, 20, str(pontos))
+    color(150, 150, 200)
+    text(580, 10, 14, "Setas = mover")
+
+    render
+    sleep(16)
+end
+
+bgcolor(40, 40, 40)
+clear
+color(60, 60, 60)
+rect(0, 0, 800, 600)
+color(255, 80, 80)
+text(230, 200, 48, "GAME OVER")
+color(80, 80, 80)
+line(150, 270, 650, 270)
+color(255, 220, 50)
+text(220, 300, 28, "Pontuacao final:")
+color(255, 255, 255)
+text(460, 300, 28, str(pontos))
+color(200, 150, 150)
+text(240, 380, 18, "Voce bateu em outro carro!")
+color(100, 100, 100)
+text(240, 430, 16, "Feche a janela para sair")
+render

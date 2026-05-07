@@ -1,0 +1,34 @@
+
+function letraAleatoria()
+begin
+    let chars = "ABCDFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    let idx = rand(0, len(chars))
+    return substring(chars, idx, 1)
+end
+
+bgcolor(0, 0, 0)
+let rodando = 1
+
+while (rodando == 1)
+begin
+    clear
+    let x = 0
+    while (x < 800)
+    begin
+        if (rand(0, 1) == 0)
+        begin
+            let y = 0
+            let verde = rand(80, 255)
+            let tam = rand(10, 18)
+            while (y < 600)
+            begin
+                color(0, verde, 0)
+                text(x, y, tam, letraAleatoria())
+                y = y + tam + 4
+            end
+        end
+        let x = x + 20
+    end
+    render
+    sleep(60)
+end

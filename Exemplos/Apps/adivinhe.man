@@ -1,0 +1,52 @@
+writeln("==============================")
+writeln("     ADIVINHE O NUMERO!       ")
+writeln("==============================")
+writeln("Estou pensando em um numero entre 1 e 100.")
+writeln("")
+
+let segredo = rand(1, 100)
+let tentativas = 0
+let acertou = 0
+
+while (acertou == 0)
+begin
+    input("Seu chute: ", chute)
+    let tentativas = tentativas + 1
+
+    if (int(chute) < int(segredo))
+    begin
+        writeln("Muito baixo! Tente maior.")
+    end
+
+    if (int(chute) > int(segredo))
+    begin
+        writeln("Muito alto! Tente menor.")
+    end
+
+    if (int(chute) == int(segredo))
+    begin
+        writeln("")
+        writeln("PARABENS! Voce acertou!")
+        writeln("O numero era: " + segredo)
+        writeln("Tentativas: " + tentativas)
+        let acertou = 1
+    end
+
+end
+
+writeln("")
+if (int(tentativas) <= 5)
+begin
+    writeln("Incrivel! Voce e um gênio!")
+end
+if (int(tentativas) > 5)
+begin
+    if (int(tentativas) <= 10)
+    begin
+        writeln("Muito bem! Boa performance!")
+    end
+end
+if (int(tentativas) > 10)
+begin
+    writeln("Continue praticando!")
+end

@@ -1,0 +1,56 @@
+3dinit
+3dcam(0, 0, -12, 0, 0)
+3dfov(520)
+
+3dcube("c1", 2)
+3dcolor("c1", 100, 180, 255)
+3dwireframe("c1", 0)
+3dpos("c1", -4, 0, 4)
+
+3dcube("c2", 2)
+3dcolor("c2", 255, 100, 80)
+3dwireframe("c2", 0)
+3dpos("c2", 0, 0, 4)
+
+3dcube("c3", 2)
+3dcolor("c3", 80, 255, 120)
+3dwireframe("c3", 0)
+3dpos("c3", 4, 0, 4)
+
+3dplane("chao", 20, 20)
+3dcolor("chao", 50, 50, 70)
+3dwireframe("chao", 0)
+3dpos("chao", 0, -2, 5)
+
+let ang = 0
+let rodando = 1
+
+while (rodando == 1)
+begin
+    bgcolor(10, 10, 20)
+    clear
+
+    3drot("c1", ang, ang, 0)
+    3drot("c2", 0, ang, ang)
+    3drot("c3", ang, 0, ang)
+
+    3drender
+
+    color(255, 255, 255)
+    text(10, 10, 16, "CUBOS 3D - setas para mover camera")
+
+    render
+    sleep(16)
+
+    let ang = ang + 2
+    if (ang >= 360)
+    begin
+        let ang = 0
+    end
+
+    key(tecla)
+    if (tecla == "escape")
+    begin
+        let rodando = 0
+    end
+end

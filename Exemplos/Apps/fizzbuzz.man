@@ -1,0 +1,45 @@
+writeln("==============================")
+writeln("         FIZZBUZZ             ")
+writeln("==============================")
+writeln("Conta de 1 ate N:")
+writeln("- Multiplo de 3: FIZZ")
+writeln("- Multiplo de 5: BUZZ")
+writeln("- Multiplo de ambos: FIZZBUZZ")
+writeln("")
+
+input("Digite o limite: ", limite)
+
+let i = 1
+while (i <= int(limite))
+begin
+    let fiz = i / 3 * 3
+    let buz = i / 5 * 5
+
+    if (fiz == i)
+    begin
+        if (buz == i)
+        begin
+            writeln(i + " - FIZZBUZZ")
+        end
+        if (buz != i)
+        begin
+            writeln(i + " - FIZZ")
+        end
+    end
+    if (fiz != i)
+    begin
+        if (buz == i)
+        begin
+            writeln(i + " - BUZZ")
+        end
+        if (buz != i)
+        begin
+            writeln(i + "")
+        end
+    end
+
+    let i = i + 1
+end
+
+writeln("")
+writeln("Fim! Total de numeros: " + limite)

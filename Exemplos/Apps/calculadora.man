@@ -1,0 +1,76 @@
+writeln("==============================")
+writeln("      CALCULADORA MAN v1.0    ")
+writeln("==============================")
+
+while (1 == 1)
+begin
+    writeln("")
+    writeln("1 - Soma")
+    writeln("2 - Subtracao")
+    writeln("3 - Multiplicacao")
+    writeln("4 - Divisao")
+    writeln("5 - Potencia (x^n)")
+    writeln("0 - Sair")
+    writeln("")
+    input("Opcao: ", op)
+
+    if (op == "0")
+    begin
+        writeln("Ate logo!")
+        break
+    end
+
+    if (op == "1")
+    begin
+        input("Numero A: ", a)
+        input("Numero B: ", b)
+        let r = a + b
+        writeln("Resultado: " + r)
+    end
+
+    if (op == "2")
+    begin
+        input("Numero A: ", a)
+        input("Numero B: ", b)
+        let r = a - b
+        writeln("Resultado: " + r)
+    end
+
+    if (op == "3")
+    begin
+        input("Numero A: ", a)
+        input("Numero B: ", b)
+        let r = a * b
+        writeln("Resultado: " + r)
+    end
+
+    if (op == "4")
+    begin
+        input("Numero A: ", a)
+        input("Numero B: ", b)
+        if (b == 0)
+        begin
+            writeln("ERRO: divisao por zero!")
+        end
+        if (b != 0)
+        begin
+            let r = a / b
+            writeln("Resultado: " + r)
+        end
+    end
+
+    if (op == "5")
+    begin
+        input("Base: ", base)
+        input("Expoente: ", exp)
+        let r = 1
+        let i = 0
+        while (i < exp)
+        begin
+            r = r * base
+            i = i + 1
+        end
+        writeln("Resultado: " + r)
+    end
+
+end

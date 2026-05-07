@@ -1,0 +1,370 @@
+bgcolor(0, 0, 0)
+
+let encontrados = 0
+let total = 8
+let tempo = 1800
+let jogo_ativo = 1
+
+# Posicoes dos objetos escondidos
+let ox1 = 120
+let oy1 = 150
+let of1 = 0
+let ox2 = 350
+let oy2 = 80
+let of2 = 0
+let ox3 = 600
+let oy3 = 200
+let of3 = 0
+let ox4 = 80
+let oy4 = 400
+let of4 = 0
+let ox5 = 450
+let oy5 = 350
+let of5 = 0
+let ox6 = 700
+let oy6 = 450
+let of6 = 0
+let ox7 = 250
+let oy7 = 480
+let of7 = 0
+let ox8 = 620
+let oy8 = 100
+let of8 = 0
+
+let raio_luz = 70
+let mx = 400
+let my = 300
+
+while (jogo_ativo == 1)
+begin
+    clear
+
+    # Fundo escuro total
+    color(5, 5, 15)
+    rect(0, 0, 800, 600)
+
+    # Atualizar mouse
+    mouse_update
+    mx = mouse_x
+    my = mouse_y
+
+    # Checar distancia e mostrar objetos proximos
+    # Objeto 1
+    if (of1 == 0)
+    begin
+        let dx1 = mx - ox1
+        let dy1 = my - oy1
+        if (dx1 < 0)
+        begin
+            dx1 = 0 - dx1
+        end
+        if (dy1 < 0)
+        begin
+            dy1 = 0 - dy1
+        end
+        let dist1 = dx1 + dy1
+        if (dist1 < raio_luz)
+        begin
+            color(255, 220, 50)
+            circle(ox1, oy1, 15)
+            color(255, 255, 100)
+            text(ox1 - 5, oy1 - 35, 14, "!")
+            if (dist1 < 30)
+            begin
+                of1 = 1
+                encontrados = encontrados + 1
+            end
+        end
+    end
+    if (of1 == 1)
+    begin
+        color(100, 255, 100)
+        circle(ox1, oy1, 15)
+    end
+
+    # Objeto 2
+    if (of2 == 0)
+    begin
+        let dx2 = mx - ox2
+        let dy2 = my - oy2
+        if (dx2 < 0)
+        begin
+            dx2 = 0 - dx2
+        end
+        if (dy2 < 0)
+        begin
+            dy2 = 0 - dy2
+        end
+        let dist2 = dx2 + dy2
+        if (dist2 < raio_luz)
+        begin
+            color(255, 100, 50)
+            rect(ox2 - 12, oy2 - 12, 24, 24)
+            if (dist2 < 30)
+            begin
+                of2 = 1
+                encontrados = encontrados + 1
+            end
+        end
+    end
+    if (of2 == 1)
+    begin
+        color(100, 255, 100)
+        rect(ox2 - 12, oy2 - 12, 24, 24)
+    end
+
+    # Objeto 3
+    if (of3 == 0)
+    begin
+        let dx3 = mx - ox3
+        let dy3 = my - oy3
+        if (dx3 < 0)
+        begin
+            dx3 = 0 - dx3
+        end
+        if (dy3 < 0)
+        begin
+            dy3 = 0 - dy3
+        end
+        let dist3 = dx3 + dy3
+        if (dist3 < raio_luz)
+        begin
+            color(100, 150, 255)
+            triangle(ox3, oy3 - 18, ox3 - 15, oy3 + 12, ox3 + 15, oy3 + 12)
+            if (dist3 < 30)
+            begin
+                of3 = 1
+                encontrados = encontrados + 1
+            end
+        end
+    end
+    if (of3 == 1)
+    begin
+        color(100, 255, 100)
+        triangle(ox3, oy3 - 18, ox3 - 15, oy3 + 12, ox3 + 15, oy3 + 12)
+    end
+
+    # Objeto 4
+    if (of4 == 0)
+    begin
+        let dx4 = mx - ox4
+        let dy4 = my - oy4
+        if (dx4 < 0)
+        begin
+            dx4 = 0 - dx4
+        end
+        if (dy4 < 0)
+        begin
+            dy4 = 0 - dy4
+        end
+        let dist4 = dx4 + dy4
+        if (dist4 < raio_luz)
+        begin
+            color(255, 50, 150)
+            circle(ox4, oy4, 18)
+            if (dist4 < 30)
+            begin
+                of4 = 1
+                encontrados = encontrados + 1
+            end
+        end
+    end
+    if (of4 == 1)
+    begin
+        color(100, 255, 100)
+        circle(ox4, oy4, 18)
+    end
+
+    # Objeto 5
+    if (of5 == 0)
+    begin
+        let dx5 = mx - ox5
+        let dy5 = my - oy5
+        if (dx5 < 0)
+        begin
+            dx5 = 0 - dx5
+        end
+        if (dy5 < 0)
+        begin
+            dy5 = 0 - dy5
+        end
+        let dist5 = dx5 + dy5
+        if (dist5 < raio_luz)
+        begin
+            color(200, 255, 50)
+            rect(ox5 - 15, oy5 - 10, 30, 20)
+            if (dist5 < 30)
+            begin
+                of5 = 1
+                encontrados = encontrados + 1
+            end
+        end
+    end
+    if (of5 == 1)
+    begin
+        color(100, 255, 100)
+        rect(ox5 - 15, oy5 - 10, 30, 20)
+    end
+
+    # Objeto 6
+    if (of6 == 0)
+    begin
+        let dx6 = mx - ox6
+        let dy6 = my - oy6
+        if (dx6 < 0)
+        begin
+            dx6 = 0 - dx6
+        end
+        if (dy6 < 0)
+        begin
+            dy6 = 0 - dy6
+        end
+        let dist6 = dx6 + dy6
+        if (dist6 < raio_luz)
+        begin
+            color(255, 180, 0)
+            triangle(ox6 - 18, oy6 + 15, ox6 + 18, oy6 + 15, ox6, oy6 - 15)
+            if (dist6 < 30)
+            begin
+                of6 = 1
+                encontrados = encontrados + 1
+            end
+        end
+    end
+    if (of6 == 1)
+    begin
+        color(100, 255, 100)
+        triangle(ox6 - 18, oy6 + 15, ox6 + 18, oy6 + 15, ox6, oy6 - 15)
+    end
+
+    # Objeto 7
+    if (of7 == 0)
+    begin
+        let dx7 = mx - ox7
+        let dy7 = my - oy7
+        if (dx7 < 0)
+        begin
+            dx7 = 0 - dx7
+        end
+        if (dy7 < 0)
+        begin
+            dy7 = 0 - dy7
+        end
+        let dist7 = dx7 + dy7
+        if (dist7 < raio_luz)
+        begin
+            color(150, 50, 255)
+            circle(ox7, oy7, 20)
+            if (dist7 < 30)
+            begin
+                of7 = 1
+                encontrados = encontrados + 1
+            end
+        end
+    end
+    if (of7 == 1)
+    begin
+        color(100, 255, 100)
+        circle(ox7, oy7, 20)
+    end
+
+    # Objeto 8
+    if (of8 == 0)
+    begin
+        let dx8 = mx - ox8
+        let dy8 = my - oy8
+        if (dx8 < 0)
+        begin
+            dx8 = 0 - dx8
+        end
+        if (dy8 < 0)
+        begin
+            dy8 = 0 - dy8
+        end
+        let dist8 = dx8 + dy8
+        if (dist8 < raio_luz)
+        begin
+            color(50, 200, 255)
+            rect(ox8 - 10, oy8 - 20, 20, 40)
+            if (dist8 < 30)
+            begin
+                of8 = 1
+                encontrados = encontrados + 1
+            end
+        end
+    end
+    if (of8 == 1)
+    begin
+        color(100, 255, 100)
+        rect(ox8 - 10, oy8 - 20, 20, 40)
+    end
+
+    # Lanterna (circulo de luz simulado)
+    color(255, 240, 150)
+    fill off
+    circle(mx, my, raio_luz)
+    circle(mx, my, raio_luz - 15)
+    fill on
+
+    # Ponto central da lanterna
+    color(255, 255, 200)
+    circle(mx, my, 5)
+
+    # HUD
+    color(200, 200, 200)
+    rect(0, 0, 800, 40)
+    color(20, 20, 40)
+    text(20, 10, 20, "CACA-SOMBRA")
+    color(50, 200, 50)
+    text(250, 10, 20, "Encontrados:")
+    color(255, 255, 255)
+    text(400, 10, 20, encontrados)
+    color(200, 200, 50)
+    text(440, 10, 20, "/ 8")
+    color(255, 80, 80)
+    text(530, 10, 20, "Tempo:")
+    color(255, 255, 255)
+    let seg = tempo / 30
+    text(640, 10, 20, seg)
+
+    tempo = tempo - 1
+
+    if (encontrados >= 8)
+    begin
+        jogo_ativo = 0
+    end
+    if (tempo <= 0)
+    begin
+        jogo_ativo = 0
+    end
+
+    render
+    sleep(33)
+end
+
+# Tela final
+clear
+color(0, 0, 0)
+rect(0, 0, 800, 600)
+
+if (encontrados >= 8)
+begin
+    color(255, 220, 50)
+    text(160, 200, 48, "VOCE VENCEU!")
+    color(100, 255, 100)
+    text(200, 280, 24, "Todos os objetos encontrados!")
+end
+if (encontrados < 8)
+begin
+    color(255, 80, 80)
+    text(180, 200, 48, "TEMPO ESGOTADO")
+    color(200, 200, 200)
+    text(220, 280, 24, "Objetos achados:")
+    color(255, 255, 255)
+    text(430, 280, 24, encontrados)
+end
+
+color(150, 150, 150)
+text(220, 420, 18, "Feche a janela para sair")
+render
+sleep(5000)

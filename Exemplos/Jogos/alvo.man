@@ -1,0 +1,353 @@
+
+let mirax = 400
+let miray = 300
+let mvel = 6
+let pontos = 0
+let vidas = 5
+let rodando = 1
+
+# Alvo 1
+let a1x = rand(60, 740)
+let a1y = rand(60, 500)
+let a1timer = 0
+let a1vida = 1
+
+# Alvo 2
+let a2x = rand(60, 740)
+let a2y = rand(60, 500)
+let a2timer = 60
+let a2vida = 1
+
+# Alvo 3
+let a3x = rand(60, 740)
+let a3y = rand(60, 500)
+let a3timer = 30
+let a3vida = 0
+
+let atirou = 0
+let atimer = 0
+
+while (rodando == 1)
+begin
+    bgcolor(20, 15, 10)
+    clear
+
+    # Fundo
+    color(30, 25, 15)
+    rect(0, 0, 800, 600)
+    color(40, 35, 20)
+    rect(0, 540, 800, 60)
+    color(60, 50, 30)
+    rect(0, 540, 800, 10)
+
+    # Teclado
+    key(tecla)
+    if (tecla == "left")
+    begin
+        let mirax = mirax - mvel
+    end
+    if (tecla == "right")
+    begin
+        let mirax = mirax + mvel
+    end
+    if (tecla == "up")
+    begin
+        let miray = miray - mvel
+    end
+    if (tecla == "down")
+    begin
+        let miray = miray + mvel
+    end
+    if (tecla == "space")
+    begin
+        if (atirou == 0)
+        begin
+            let atirou = 1
+            let atimer = 8
+        end
+    end
+
+    if (mirax < 20)
+    begin
+        let mirax = 20
+    end
+    if (mirax > 780)
+    begin
+        let mirax = 780
+    end
+    if (miray < 20)
+    begin
+        let miray = 20
+    end
+    if (miray > 540)
+    begin
+        let miray = 540
+    end
+
+    # Timers dos alvos
+    if (a1vida == 1)
+    begin
+        let a1timer = a1timer + 1
+        if (a1timer > 120)
+        begin
+            let a1timer = 0
+            let a1x = rand(60, 740)
+            let a1y = rand(60, 500)
+            let vidas = vidas - 1
+            if (vidas < 1)
+            begin
+                let rodando = 0
+            end
+        end
+    end
+    if (a1vida == 0)
+    begin
+        let a1timer = a1timer + 1
+        if (a1timer > 30)
+        begin
+            let a1vida = 1
+            let a1timer = 0
+            let a1x = rand(60, 740)
+            let a1y = rand(60, 500)
+        end
+    end
+
+    if (a2vida == 1)
+    begin
+        let a2timer = a2timer + 1
+        if (a2timer > 100)
+        begin
+            let a2timer = 0
+            let a2x = rand(60, 740)
+            let a2y = rand(60, 500)
+            let vidas = vidas - 1
+            if (vidas < 1)
+            begin
+                let rodando = 0
+            end
+        end
+    end
+    if (a2vida == 0)
+    begin
+        let a2timer = a2timer + 1
+        if (a2timer > 40)
+        begin
+            let a2vida = 1
+            let a2timer = 0
+            let a2x = rand(60, 740)
+            let a2y = rand(60, 500)
+        end
+    end
+
+    if (a3vida == 1)
+    begin
+        let a3timer = a3timer + 1
+        if (a3timer > 80)
+        begin
+            let a3timer = 0
+            let a3x = rand(60, 740)
+            let a3y = rand(60, 500)
+            let vidas = vidas - 1
+            if (vidas < 1)
+            begin
+                let rodando = 0
+            end
+        end
+    end
+    if (a3vida == 0)
+    begin
+        let a3timer = a3timer + 1
+        if (a3timer > 50)
+        begin
+            let a3vida = 1
+            let a3timer = 0
+            let a3x = rand(60, 740)
+            let a3y = rand(60, 500)
+        end
+    end
+
+    # Checa acerto ao atirar
+    if (atirou == 1)
+    begin
+        # Alvo 1
+        if (a1vida == 1)
+        begin
+            let ddx = mirax - a1x
+            let ddy = miray - a1y
+            if (ddx < 0)
+            begin
+                let ddx = 0 - ddx
+            end
+            if (ddy < 0)
+            begin
+                let ddy = 0 - ddy
+            end
+            if (ddx < 30)
+            begin
+                if (ddy < 30)
+                begin
+                    let a1vida = 0
+                    let a1timer = 0
+                    let pontos = pontos + 20
+                    let atirou = 0
+                end
+            end
+        end
+
+        # Alvo 2
+        if (a2vida == 1)
+        begin
+            let ddx = mirax - a2x
+            let ddy = miray - a2y
+            if (ddx < 0)
+            begin
+                let ddx = 0 - ddx
+            end
+            if (ddy < 0)
+            begin
+                let ddy = 0 - ddy
+            end
+            if (ddx < 30)
+            begin
+                if (ddy < 30)
+                begin
+                    let a2vida = 0
+                    let a2timer = 0
+                    let pontos = pontos + 20
+                    let atirou = 0
+                end
+            end
+        end
+
+        # Alvo 3
+        if (a3vida == 1)
+        begin
+            let ddx = mirax - a3x
+            let ddy = miray - a3y
+            if (ddx < 0)
+            begin
+                let ddx = 0 - ddx
+            end
+            if (ddy < 0)
+            begin
+                let ddy = 0 - ddy
+            end
+            if (ddx < 30)
+            begin
+                if (ddy < 30)
+                begin
+                    let a3vida = 0
+                    let a3timer = 0
+                    let pontos = pontos + 20
+                    let atirou = 0
+                end
+            end
+        end
+    end
+
+    # Timer do tiro
+    if (atimer > 0)
+    begin
+        let atimer = atimer - 1
+        if (atimer == 0)
+        begin
+            let atirou = 0
+        end
+    end
+
+    # Desenha alvos
+    if (a1vida == 1)
+    begin
+        color(200, 40, 40)
+        circle(a1x, a1y, 30)
+        color(255, 255, 255)
+        circle(a1x, a1y, 22)
+        color(200, 40, 40)
+        circle(a1x, a1y, 14)
+        color(255, 220, 40)
+        circle(a1x, a1y, 6)
+    end
+
+    if (a2vida == 1)
+    begin
+        color(40, 160, 200)
+        circle(a2x, a2y, 28)
+        color(255, 255, 255)
+        circle(a2x, a2y, 20)
+        color(40, 160, 200)
+        circle(a2x, a2y, 12)
+        color(255, 220, 40)
+        circle(a2x, a2y, 5)
+    end
+
+    if (a3vida == 1)
+    begin
+        color(40, 200, 80)
+        circle(a3x, a3y, 24)
+        color(255, 255, 255)
+        circle(a3x, a3y, 16)
+        color(40, 200, 80)
+        circle(a3x, a3y, 8)
+        color(255, 220, 40)
+        circle(a3x, a3y, 4)
+    end
+
+    # Mira
+    color(255, 255, 255)
+    line(mirax - 20, miray, mirax - 8, miray)
+    line(mirax + 8, miray, mirax + 20, miray)
+    line(mirax, miray - 20, mirax, miray - 8)
+    line(mirax, miray + 8, mirax, miray + 20)
+    fill off
+    circle(mirax, miray, 10)
+    fill on
+
+    # Efeito do tiro
+    if (atimer > 0)
+    begin
+        color(255, 255, 100)
+        circle(mirax, miray, 6)
+    end
+
+    # Vidas como alvos pequenos
+    let hx = 10
+    let hi = 0
+    while (hi < vidas)
+    begin
+        color(200, 40, 40)
+        circle(hx + 10, 575, 8)
+        color(255, 255, 255)
+        circle(hx + 10, 575, 5)
+        color(200, 40, 40)
+        circle(hx + 10, 575, 3)
+        let hx = hx + 26
+        let hi = hi + 1
+    end
+
+    # HUD
+    color(255, 220, 50)
+    text(340, 568, 18, "PONTOS:")
+    color(255, 255, 255)
+    text(445, 568, 18, str(pontos))
+    color(150, 150, 200)
+    text(580, 568, 13, "Setas+Espaco")
+
+    render
+    sleep(16)
+end
+
+bgcolor(20, 15, 10)
+clear
+color(30, 25, 15)
+rect(0, 0, 800, 600)
+color(255, 80, 80)
+text(230, 200, 48, "GAME OVER")
+color(255, 220, 50)
+text(220, 300, 28, "Pontuacao final:")
+color(255, 255, 255)
+text(460, 300, 28, str(pontos))
+color(200, 160, 120)
+text(230, 380, 18, "Os alvos escaparam!")
+color(100, 100, 100)
+text(240, 430, 16, "Feche a janela para sair")
+render

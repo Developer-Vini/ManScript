@@ -1,0 +1,40 @@
+let vitorias = 0
+let derrotas = 0
+let rodadas = 0
+let jogando = 1
+
+while (jogando == 1)
+begin
+  writeln("=== Cara ou Coroa ===")
+  writeln("Vitorias: " + str(vitorias) + "  Derrotas: " + str(derrotas))
+  input("Aposte (cara/coroa) ou 'sair': ", aposta)
+  let al = lower(aposta)
+
+  if (al == "sair")
+  begin
+    let jogando = 0
+  else
+    let moeda = rand(1, 2)
+    let resultado = "cara"
+    if (moeda == 2)
+    begin
+      let resultado = "coroa"
+    end
+    writeln("Caiu: " + resultado)
+    let rodadas = rodadas + 1
+
+    if (al == resultado)
+    begin
+      writeln("Acertou!")
+      let vitorias = vitorias + 1
+    else
+      writeln("Errou!")
+      let derrotas = derrotas + 1
+    end
+  end
+end
+
+writeln("=== Fim ===")
+writeln("Rodadas:  " + str(rodadas))
+writeln("Vitorias: " + str(vitorias))
+writeln("Derrotas: " + str(derrotas))

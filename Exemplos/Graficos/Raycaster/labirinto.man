@@ -1,0 +1,115 @@
+rcsetmap(10, 10)
+
+rcwall(0, 0, 1)
+rcwall(1, 0, 1)
+rcwall(2, 0, 1)
+rcwall(3, 0, 1)
+rcwall(4, 0, 1)
+rcwall(5, 0, 1)
+rcwall(6, 0, 1)
+rcwall(7, 0, 1)
+rcwall(8, 0, 1)
+rcwall(9, 0, 1)
+
+rcwall(0, 9, 1)
+rcwall(1, 9, 1)
+rcwall(2, 9, 1)
+rcwall(3, 9, 1)
+rcwall(4, 9, 1)
+rcwall(5, 9, 1)
+rcwall(6, 9, 1)
+rcwall(7, 9, 1)
+rcwall(8, 9, 1)
+rcwall(9, 9, 1)
+
+rcwall(0, 1, 1)
+rcwall(0, 2, 1)
+rcwall(0, 3, 1)
+rcwall(0, 4, 1)
+rcwall(0, 5, 1)
+rcwall(0, 6, 1)
+rcwall(0, 7, 1)
+rcwall(0, 8, 1)
+
+rcwall(9, 1, 1)
+rcwall(9, 2, 1)
+rcwall(9, 3, 1)
+rcwall(9, 4, 1)
+rcwall(9, 5, 1)
+rcwall(9, 6, 1)
+rcwall(9, 7, 1)
+rcwall(9, 8, 1)
+
+rcwall(2, 2, 1)
+rcwall(3, 2, 1)
+rcwall(4, 2, 1)
+rcwall(2, 3, 1)
+rcwall(4, 3, 1)
+rcwall(4, 4, 1)
+rcwall(4, 5, 1)
+rcwall(3, 5, 1)
+
+rcwall(6, 2, 1)
+rcwall(6, 3, 1)
+rcwall(6, 4, 1)
+rcwall(7, 4, 1)
+rcwall(7, 6, 1)
+rcwall(6, 6, 1)
+rcwall(5, 6, 1)
+rcwall(5, 7, 1)
+rcwall(5, 8, 1)
+
+rcwall(2, 7, 1)
+rcwall(3, 7, 1)
+rcwall(3, 6, 1)
+
+rcsetceil(20, 20, 40)
+rcsetfloor(60, 50, 40)
+rcminimap(1)
+
+rcsetpos(1, 1, 1, 0)
+
+let vel = 0.06
+let rodando = 1
+
+while (rodando == 1)
+begin
+    key(tecla)
+
+    if (tecla == "up")
+    begin
+        rcmove(vel)
+    end
+    if (tecla == "down")
+    begin
+        rcmove(0 - vel)
+    end
+    if (tecla == "left")
+    begin
+        rcturn(0 - 3)
+    end
+    if (tecla == "right")
+    begin
+        rcturn(3)
+    end
+    if (tecla == "a")
+    begin
+        rcstrafe(0 - vel)
+    end
+    if (tecla == "d")
+    begin
+        rcstrafe(vel)
+    end
+    if (tecla == "escape")
+    begin
+        let rodando = 0
+    end
+
+    rcrender
+
+    color(255, 220, 80)
+    text(10, 10, 15, "LABIRINTO - setas: mover  A/D: strafe  ESC: sair")
+
+    render
+    sleep(16)
+end

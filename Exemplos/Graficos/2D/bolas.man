@@ -1,0 +1,187 @@
+
+bgcolor(5, 5, 20)
+
+# bola 1
+let b1x = 200
+let b1y = 150
+let b1vx = 5
+let b1vy = 3
+let b1r = 30
+
+# bola 2
+let b2x = 500
+let b2y = 400
+let b2vx = -4
+let b2vy = 5
+let b2r = 20
+
+# bola 3
+let b3x = 700
+let b3y = 200
+let b3vx = -6
+let b3vy = -4
+let b3r = 40
+
+# bola 4
+let b4x = 100
+let b4y = 500
+let b4vx = 7
+let b4vy = -3
+let b4r = 15
+
+let frame = 0
+
+while (1 == 1)
+begin
+    clear
+    bgcolor(5, 5, 20)
+
+    # --- borda da arena ---
+    color(40, 40, 100)
+    fill off
+    rect(5, 5, 790, 590)
+
+    # ========================
+    # BOLA 1 - azul
+    # ========================
+    let b1x = b1x + b1vx
+    let b1y = b1y + b1vy
+
+    if (b1x - b1r < 10)
+    begin
+        let b1vx = b1vx * -1
+        let b1x = 10 + b1r
+    end
+    if (b1x + b1r > 790)
+    begin
+        let b1vx = b1vx * -1
+        let b1x = 790 - b1r
+    end
+    if (b1y - b1r < 10)
+    begin
+        let b1vy = b1vy * -1
+        let b1y = 10 + b1r
+    end
+    if (b1y + b1r > 590)
+    begin
+        let b1vy = b1vy * -1
+        let b1y = 590 - b1r
+    end
+
+    color(60, 120, 255)
+    fill on
+    circle(b1x, b1y, b1r)
+    color(160, 200, 255)
+    fill on
+    circle(b1x - b1r / 3, b1y - b1r / 3, b1r / 4)
+
+    # ========================
+    # BOLA 2 - vermelha
+    # ========================
+    let b2x = b2x + b2vx
+    let b2y = b2y + b2vy
+
+    if (b2x - b2r < 10)
+    begin
+        let b2vx = b2vx * -1
+        let b2x = 10 + b2r
+    end
+    if (b2x + b2r > 790)
+    begin
+        let b2vx = b2vx * -1
+        let b2x = 790 - b2r
+    end
+    if (b2y - b2r < 10)
+    begin
+        let b2vy = b2vy * -1
+        let b2y = 10 + b2r
+    end
+    if (b2y + b2r > 590)
+    begin
+        let b2vy = b2vy * -1
+        let b2y = 590 - b2r
+    end
+
+    color(255, 60, 60)
+    fill on
+    circle(b2x, b2y, b2r)
+    color(255, 180, 180)
+    fill on
+    circle(b2x - b2r / 3, b2y - b2r / 3, b2r / 4)
+
+    # ========================
+    # BOLA 3 - verde
+    # ========================
+    let b3x = b3x + b3vx
+    let b3y = b3y + b3vy
+
+    if (b3x - b3r < 10)
+    begin
+        let b3vx = b3vx * -1
+        let b3x = 10 + b3r
+    end
+    if (b3x + b3r > 790)
+    begin
+        let b3vx = b3vx * -1
+        let b3x = 790 - b3r
+    end
+    if (b3y - b3r < 10)
+    begin
+        let b3vy = b3vy * -1
+        let b3y = 10 + b3r
+    end
+    if (b3y + b3r > 590)
+    begin
+        let b3vy = b3vy * -1
+        let b3y = 590 - b3r
+    end
+
+    color(60, 220, 80)
+    fill on
+    circle(b3x, b3y, b3r)
+    color(180, 255, 180)
+    fill on
+    circle(b3x - b3r / 3, b3y - b3r / 3, b3r / 4)
+
+    # ========================
+    # BOLA 4 - amarela
+    # ========================
+    let b4x = b4x + b4vx
+    let b4y = b4y + b4vy
+
+    if (b4x - b4r < 10)
+    begin
+        let b4vx = b4vx * -1
+        let b4x = 10 + b4r
+    end
+    if (b4x + b4r > 790)
+    begin
+        let b4vx = b4vx * -1
+        let b4x = 790 - b4r
+    end
+    if (b4y - b4r < 10)
+    begin
+        let b4vy = b4vy * -1
+        let b4y = 10 + b4r
+    end
+    if (b4y + b4r > 590)
+    begin
+        let b4vy = b4vy * -1
+        let b4y = 590 - b4r
+    end
+
+    color(255, 220, 40)
+    fill on
+    circle(b4x, b4y, b4r)
+    color(255, 255, 180)
+    fill on
+    circle(b4x - b4r / 3, b4y - b4r / 3, b4r / 4)
+
+    # --- HUD ---
+    color(180, 180, 255)
+    text(10, 10, 14, "BOLAS QUICANDO  |  ESC = sair")
+    let frame = frame + 1
+
+    render
+    sleep(16)
+end
