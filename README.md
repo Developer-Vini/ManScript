@@ -1,15 +1,15 @@
-# ManScript
+# jsScript
 
 <image src="logo/logo.png">
 
 ## Visao Geral
 
-ManScript e uma linguagem dinamica, interpretada, pequena e pensada para scripts, automacao leve, apps 2D e jogos simples. O nucleo de console fica em `bin/mz.exe`. O backend grafico SDL fica em `bin/mz_sdl.exe`.
+jsScript e uma linguagem dinamica, interpretada, pequena e pensada para scripts, automacao leve, apps 2D e jogos simples. O nucleo de console fica em `bin/mz.exe`. O backend grafico SDL fica em `bin/mz_sdl.exe`.
 
 Exemplo minimo:
 
-```man
-print("ManScript");
+```js
+print("jsScript");
 
 let nome = "Zero";
 let pontos = 10;
@@ -18,24 +18,29 @@ if (pontos > 0) {
     print(nome + ":", pontos);
 }
 ```
+# Instalação
+
+```powershell
+git clone https://github.com/Developer-Vini/jsScript.git
+```
 
 ## Como Executar
 
 Console:
 
 ```powershell
-.\bin\mz.exe examples\basico.man
+.\bin\mz.exe examples\basico.js
 ```
 
 SDL:
 
 ```powershell
-.\bin\mz_sdl.exe examples\games\snake_zero.man
+.\bin\mz_sdl.exe examples\games\snake_zero.js
 ```
 
 ## Comentarios
 
-```man
+```js
 # comentario de linha
 // comentario de linha
 
@@ -49,7 +54,7 @@ em bloco
 
 Nomes podem conter letras, numeros e `_`, mas devem comecar com letra ou `_`.
 
-```man
+```js
 let vida = 100;
 let player_x = 32;
 let _interno = true;
@@ -76,7 +81,7 @@ Tipos nativos:
 
 Use `type(valor)` para inspecionar:
 
-```man
+```js
 print(type(10));        # number
 print(type("oi"));      # string
 print(type([1, 2]));    # array
@@ -96,19 +101,19 @@ Todo array, objeto, funcao e native e verdadeiro. Numeros diferentes de zero e s
 
 ## Numeros
 
-```man
+```js
 let a = 10;
 let b = 3.5;
 let c = .25;
 ```
 
-Numeros sao usados tambem para coordenadas, tamanhos, indices e handles de imagem.
+Numeros sao usados tambem para coordenadas, tajshos, indices e handles de imagem.
 
 ## Strings
 
 Strings usam aspas duplas:
 
-```man
+```js
 let nome = "Ana";
 print("Ola, " + nome);
 ```
@@ -117,7 +122,7 @@ O operador `+` concatena quando pelo menos um dos lados e string. Outros tipos s
 
 Indexacao de string retorna um caractere como string:
 
-```man
+```js
 let s = "abc";
 print(s[0]); # a
 ```
@@ -126,7 +131,7 @@ Indice fora do texto retorna `null`.
 
 ## Variaveis
 
-```man
+```js
 let x = 10;
 var y = 20;
 let vazio;
@@ -136,7 +141,7 @@ Variavel sem valor inicial recebe `null`.
 
 ## Arrays
 
-```man
+```js
 let lista = [10, 20, 30];
 print(lista[0]);
 
@@ -147,7 +152,7 @@ print(len(lista));
 
 Ao atribuir em um indice alem do fim, o array cresce e preenche lacunas com `null`:
 
-```man
+```js
 let a = [];
 a[2] = "fim";
 print(len(a)); # 3
@@ -155,17 +160,17 @@ print(len(a)); # 3
 
 ## Objetos
 
-```man
+```js
 let player = {x: 10, y: 20, nome: "Heroi"};
 print(player.x);
 
 player.vida = 100;
-player["mana"] = 50;
+player["jsa"] = 50;
 ```
 
 Chaves literais podem ser identificadores ou strings:
 
-```man
+```js
 let obj = {
     nome: "Loja",
     "preco-base": 25
@@ -178,7 +183,7 @@ Acesso inexistente retorna `null`.
 
 Declaracao nomeada:
 
-```man
+```js
 fun soma(a, b) {
     return a + b;
 }
@@ -188,7 +193,7 @@ print(soma(2, 3));
 
 Funcao anonima:
 
-```man
+```js
 let dobro = fun(n) {
     return n * 2;
 };
@@ -198,7 +203,7 @@ let dobro = fun(n) {
 
 Funcoes capturam o escopo onde foram criadas:
 
-```man
+```js
 fun contador() {
     let n = 0;
     return fun() {
@@ -223,7 +228,7 @@ Limites atuais:
 
 Quando uma funcao guardada em objeto e chamada com ponto, o objeto entra como `this`.
 
-```man
+```js
 let player = {
     x: 10,
     mover: fun(dx) {
@@ -239,7 +244,7 @@ print(player.x); # 15
 
 Blocos criam escopo:
 
-```man
+```js
 let x = 1;
 {
     let x = 2;
@@ -252,7 +257,7 @@ print(x); # 1
 
 ## Condicionais
 
-```man
+```js
 if (vida <= 0) {
     print("fim");
 } else {
@@ -264,7 +269,7 @@ O corpo pode ser um bloco ou uma unica instrucao, mas em jogos prefira blocos.
 
 `switch` compara o valor principal com cada `case` usando `==`. Ele executa somente o primeiro `case` compatível, ou `default` se nenhum combinar. Nao existe fallthrough automatico: o proximo `case` nao roda sozinho.
 
-```man
+```js
 switch (tile) {
     case 1:
         textura = parede;
@@ -275,13 +280,13 @@ switch (tile) {
 }
 ```
 
-Voce pode usar `break;` dentro do `switch` para sair antes do fim do bloco do `case`, especialmente quando ha varios comandos.
+Voce pode usar `break;` dentro do `switch` para sair antes do fim do bloco do `case`, especialmente quando ha varios cojsdos.
 
 ## Loops
 
 `while`:
 
-```man
+```js
 let i = 0;
 while (i < 5) {
     print(i);
@@ -291,7 +296,7 @@ while (i < 5) {
 
 `for` C-style:
 
-```man
+```js
 for (let i = 0; i < 5; i++) {
     print(i);
 }
@@ -299,9 +304,9 @@ for (let i = 0; i < 5; i++) {
 
 `break` sai do loop. `continue` pula para a proxima iteracao.
 
-Nao existe `for in` no ManScript atual. Para percorrer arrays, use indice:
+Nao existe `for in` no jsScript atual. Para percorrer arrays, use indice:
 
-```man
+```js
 let itens = ["a", "b", "c"];
 let i = 0;
 while (i < len(itens)) {
@@ -314,7 +319,7 @@ while (i < len(itens)) {
 
 Aritmeticos:
 
-```man
+```js
 a + b
 a - b
 a * b
@@ -325,7 +330,7 @@ a % b
 
 Comparacao:
 
-```man
+```js
 a == b
 a != b
 a < b
@@ -336,7 +341,7 @@ a >= b
 
 Logicos:
 
-```man
+```js
 not vivo
 !vivo
 a and b
@@ -345,7 +350,7 @@ a or b
 
 Atribuicao:
 
-```man
+```js
 x = 10;
 x += 2;
 x -= 2;
@@ -358,7 +363,7 @@ x--;
 
 Atribuicao funciona em variaveis, campos e indices:
 
-```man
+```js
 player.x += 4;
 lista[0]++;
 obj["chave"] = 123;
@@ -406,7 +411,7 @@ Conversao para string:
 
 Imprime os argumentos separados por espaco e quebra linha.
 
-```man
+```js
 print("vida", 100);
 ```
 
@@ -422,20 +427,20 @@ Converte para number.
 
 Retorna `"null"`, `"number"`, `"bool"`, `"string"`, `"array"`, `"object"`, `"function"` ou `"native"`.
 
-### Tamanho e Colecoes
+### Tajsho e Colecoes
 
 `len(valor)`
 
 Retorna:
 
-- tamanho de string.
+- tajsho de string.
 - quantidade de itens de array.
 - quantidade de campos de object.
 - `0` para outros tipos.
 
 `push(array, valor)`
 
-Adiciona no fim e retorna o novo tamanho.
+Adiciona no fim e retorna o novo tajsho.
 
 `pop(array)`
 
@@ -473,13 +478,13 @@ Converte itens para texto e junta com separador.
 
 Constante:
 
-```man
+```js
 PI
 ```
 
 Funcoes:
 
-```man
+```js
 abs(x)
 floor(x)
 ceil(x)
@@ -509,13 +514,13 @@ As funcoes abaixo existem somente no executavel `mz_sdl.exe`.
 
 Cria janela SDL. Tambem aceita `window(largura, altura)` e `window(largura, altura, titulo)`.
 
-```man
+```js
 window("Meu Jogo", 800, 600);
 ```
 
 `logical_size(largura, altura, esticar)`
 
-Define uma resolucao logica para desenho. A janela pode ser maior, mas todos os comandos de desenho usam essa resolucao e o SDL escala o resultado. Use para jogos pixel art ou raycasting ficarem mais leves.
+Define uma resolucao logica para desenho. A janela pode ser maior, mas todos os cojsdos de desenho usam essa resolucao e o SDL escala o resultado. Use para jogos pixel art ou raycasting ficarem mais leves.
 
 `running()`
 
@@ -599,7 +604,7 @@ Se `preenchido` for `0`, desenha contorno.
 
 Desenha texto com uma fonte bitmap embutida usando a cor atual. Tambem aceita escala:
 
-```man
+```js
 color(255, 240, 200);
 text("READY?", 320, 180, 4);
 ```
@@ -620,13 +625,13 @@ Carrega BMP ou PNG. Retorna id numerico ou `0` se falhar.
 
 Carrega BMP ou PNG e transforma pixels proximos da cor indicada em transparentes. Use para folhas com fundo verde/magenta.
 
-```man
+```js
 let sprite = image_load_key("assets/sprite.png", 71, 112, 76, 8);
 ```
 
 `image(id, x, y)`
 
-Desenha no tamanho original.
+Desenha no tajsho original.
 
 `image(id, x, y, w, h)`
 
@@ -646,7 +651,7 @@ Desenha um recorte escalado com espelhamento horizontal e/ou vertical. Use para 
 
 `image_w(id)`, `image_h(id)`
 
-Retornam tamanho da imagem.
+Retornam tajsho da imagem.
 
 `image_free(id)`
 
@@ -654,13 +659,13 @@ Libera a textura.
 
 ### Raycasting Acelerado
 
-`raycast_walls(mapa, mapa_w, mapa_h, px, py, angulo, fov, distancia_tela, escala, texturas, textura_tamanho, tela_w, tela_h)`
+`raycast_walls(mapa, mapa_w, mapa_h, px, py, angulo, fov, distancia_tela, escala, texturas, textura_tajsho, tela_w, tela_h)`
 
 Desenha colunas de parede por raycasting no backend C/SDL. `mapa` e um array linear de tiles, `texturas` e um array onde o indice do tile aponta para a imagem carregada. Foi criado para jogos estilo Wolfenstein, evitando centenas de chamadas interpretadas por frame.
 
 `ray_wall_distance_fast(mapa, mapa_w, mapa_h, px, py, ex, ey)`
 
-Retorna a distancia ate a primeira parede entre o ponto do player e o ponto alvo. Use para testes de visibilidade/oclusao sem fazer esse raycast em ManScript a cada sprite ou NPC.
+Retorna a distancia ate a primeira parede entre o ponto do player e o ponto alvo. Use para testes de visibilidade/oclusao sem fazer esse raycast em jsScript a cada sprite ou NPC.
 
 `next_path_cell_fast(mapa, mapa_w, mapa_h, sx, sy, gx, gy)`
 
@@ -668,23 +673,23 @@ Calcula em C a proxima celula de um caminho em grade e retorna o indice linear d
 
 ### Voxels 3D Acelerados
 
-`voxel3d_render(blocos, largura, altura, profundidade, cam_x, cam_y, cam_z, yaw, pitch, fov, atlas, tile_tamanho, tela_w, tela_h, distancia, max_faces)`
+`voxel3d_render(blocos, largura, altura, profundidade, cam_x, cam_y, cam_z, yaw, pitch, fov, atlas, tile_tajsho, tela_w, tela_h, distancia, max_faces)`
 
-Renderiza um mundo de cubos 3D usando o renderer SDL. `blocos` e um array linear em ordem `(y * profundidade + z) * largura + x`, onde `0` e ar e valores maiores apontam para celulas do atlas. A funcao faz a projecao e desenho das faces em C para manter jogos voxel leves na linguagem.
+Renderiza um mundo de cubos 3D usando o renderer SDL. `blocos` e um array linear em ordem `(y * profundidade + z) * largura + x`, onde `0` e ar e valores maiores apontam para celulas do atlas. A funcao faz a projecao e desenho das faces em C para jster jogos voxel leves na linguagem.
 
 
 ## Padroes Recomendados
 
 Use ponto e virgula por clareza, embora muitas instrucoes aceitem fim sem `;`.
 
-```man
+```js
 let x = 10;
 print(x);
 ```
 
-Em jogos, mantenha o loop neste formato:
+Em jogos, jstenha o loop neste formato:
 
-```man
+```js
 window("Jogo", 640, 480);
 
 while (running()) {
@@ -700,7 +705,7 @@ while (running()) {
 
 Para listas grandes, prefira `while` com indice. Para entidades, use objetos dentro de arrays:
 
-```man
+```js
 let inimigos = [
     {x: 100, y: 80, vida: 3},
     {x: 180, y: 90, vida: 2}
