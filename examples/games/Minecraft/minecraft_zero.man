@@ -1,0 +1,384 @@
+//.\bin\mz_sdl.exe .\examples\games\Minecraft\minecraft_zero.man
+
+window("Minecraft", 1280, 720);
+logical_size(640, 360, true);
+mouse_relative(true);
+
+let W = 640;
+let H = 360;
+let WORLD_W = 28;
+let WORLD_H = 13;
+let WORLD_D = 28;
+let FOV = 1.04719755;
+let MAX_VIEW = 30;
+let TILE_SIZE = 128;
+
+let BASE = "examples/games/Minecraft/assets/";
+let atlas = image_load(BASE + "tex_array_0.png");
+let frame_img = image_load(BASE + "frame.png");
+
+let SAND = 4;
+let GRASS = 9;
+let DIRT = 10;
+let STONE = 13;
+let SNOW = 16;
+let LEAVES = 19;
+let WOOD = 23;
+
+let block_names = ["Air", "Sand", "Grass", "Dirt", "Stone", "Snow", "Leaves", "Wood"];
+let palette = [0, SAND, GRASS, DIRT, STONE, SNOW, LEAVES, WOOD];
+
+let world = [];
+let px = 14.5;
+let py = 8.2;
+let pz = 20.5;
+let vy = 0.0;
+let yaw = 3.14159;
+let pitch = -0.18;
+let selected = 2;
+let on_ground = false;
+let left_lock = false;
+let right_lock = false;
+let key_lock = false;
+let last_ticks = ticks();
+let delta_time = 16;
+let frame_started = 0;
+let faces = 0;
+let target_x = -1;
+let target_y = -1;
+let target_z = -1;
+let place_x = -1;
+let place_y = -1;
+let place_z = -1;
+
+fun idx3(x, y, z) {
+    return (y * WORLD_D + z) * WORLD_W + x;
+}
+
+fun in_world(x, y, z) {
+    return x >= 0 and y >= 0 and z >= 0 and x < WORLD_W and y < WORLD_H and z < WORLD_D;
+}
+
+fun get_block(x, y, z) {
+    if (!in_world(x, y, z)) { return STONE; }
+    return world[idx3(x, y, z)];
+}
+
+fun set_block(x, y, z, id) {
+    if (in_world(x, y, z)) { world[idx3(x, y, z)] = id; }
+}
+
+fun solid_at(x, y, z) {
+    return get_block(x, y, z) > 0;
+}
+
+fun height_at(x, z) {
+    let n = sin(x * 0.43 + z * 0.17) * 2.4 + cos(x * 0.21 - z * 0.38) * 1.7 + sin((x + z) * 0.19) * 1.5;
+    return floor(4 + n);
+}
+
+fun make_tree(x, y, z) {
+    let i = 0;
+    while (i < 4) {
+        set_block(x, y + i, z, WOOD);
+        i++;
+    }
+    let dx = -2;
+    while (dx <= 2) {
+        let dz = -2;
+        while (dz <= 2) {
+            let dy = 2;
+            while (dy <= 5) {
+                if (abs(dx) + abs(dz) + max(0, dy - 4) < 4) {
+                    if (get_block(x + dx, y + dy, z + dz) == 0) {
+                        set_block(x + dx, y + dy, z + dz, LEAVES);
+                    }
+                }
+                dy++;
+            }
+            dz++;
+        }
+        dx++;
+    }
+}
+
+fun generate_world() {
+    world = [];
+    let y = 0;
+    while (y < WORLD_H) {
+        let z = 0;
+        while (z < WORLD_D) {
+            let x = 0;
+            while (x < WORLD_W) {
+                push(world, 0);
+                x++;
+            }
+            z++;
+        }
+        y++;
+    }
+
+    z = 0;
+    while (z < WORLD_D) {
+        let x = 0;
+        while (x < WORLD_W) {
+            let h = height_at(x, z);
+            if (h < 2) { h = 2; }
+            if (h > WORLD_H - 4) { h = WORLD_H - 4; }
+            y = 0;
+            while (y <= h) {
+                let id = STONE;
+                if (y == h) { id = GRASS; }
+                else if (y > h - 3) { id = DIRT; }
+                if (h < 4 and y == h) { id = SAND; }
+                if (h > 7 and y == h) { id = SNOW; }
+                set_block(x, y, z, id);
+                y++;
+            }
+            x++;
+        }
+        z++;
+    }
+
+    let i = 0;
+    while (i < 18) {
+        let tx = 3 + rand_int(WORLD_W - 6);
+        let tz = 3 + rand_int(WORLD_D - 6);
+        let th = height_at(tx, tz);
+        if (th > 3 and th < WORLD_H - 6) { make_tree(tx, th + 1, tz); }
+        i++;
+    }
+
+    px = 14.5;
+    pz = 20.5;
+    py = height_at(floor(px), floor(pz)) + 2.4;
+    vy = 0;
+    yaw = 3.14159;
+    pitch = -0.18;
+}
+
+generate_world();
+
+fun player_blocked(x, y, z) {
+    let bx0 = floor(x - 0.23);
+    let bx1 = floor(x + 0.23);
+    let by0 = floor(y - 1.55);
+    let by1 = floor(y + 0.05);
+    let bz0 = floor(z - 0.23);
+    let bz1 = floor(z + 0.23);
+    if (solid_at(bx0, by0, bz0) or solid_at(bx1, by0, bz0) or solid_at(bx0, by0, bz1) or solid_at(bx1, by0, bz1)) { return true; }
+    if (solid_at(bx0, by1, bz0) or solid_at(bx1, by1, bz0) or solid_at(bx0, by1, bz1) or solid_at(bx1, by1, bz1)) { return true; }
+    return false;
+}
+
+fun move_player(dx, dz) {
+    if (!player_blocked(px + dx, py, pz)) { px += dx; }
+    if (!player_blocked(px, py, pz + dz)) { pz += dz; }
+}
+
+fun update_physics() {
+    let step = delta_time / 16.0;
+    vy -= 0.0065 * step;
+    if (vy < -0.22) { vy = -0.22; }
+    let ny = py + vy * step;
+    if (player_blocked(px, ny, pz)) {
+        if (vy < 0) {
+            on_ground = true;
+            while (!player_blocked(px, py - 0.02, pz) and py > 2) { py -= 0.02; }
+            py += 0.02;
+        } else {
+            while (!player_blocked(px, py + 0.02, pz) and py < WORLD_H - 1) { py += 0.02; }
+            py -= 0.02;
+        }
+        vy = 0;
+    } else {
+        py = ny;
+        on_ground = false;
+    }
+    if (py < 2) { py = 10; px = 14.5; pz = 20.5; vy = 0; }
+}
+
+fun cast_target() {
+    target_x = -1;
+    place_x = -1;
+    let dx = sin(yaw) * cos(pitch);
+    let dy = sin(pitch);
+    let dz = cos(yaw) * cos(pitch);
+    let last_x = floor(px);
+    let last_y = floor(py);
+    let last_z = floor(pz);
+    let t = 0.15;
+    while (t < 6.0) {
+        let x = floor(px + dx * t);
+        let y = floor(py + dy * t);
+        let z = floor(pz + dz * t);
+        if (solid_at(x, y, z)) {
+            target_x = x;
+            target_y = y;
+            target_z = z;
+            place_x = last_x;
+            place_y = last_y;
+            place_z = last_z;
+            return null;
+        }
+        last_x = x;
+        last_y = y;
+        last_z = z;
+        t += 0.12;
+    }
+}
+
+fun edit_blocks() {
+    cast_target();
+    if (mouse_left() and !left_lock) {
+        if (target_x > 0 and target_z > 0 and target_x < WORLD_W - 1 and target_z < WORLD_D - 1 and target_y > 0) {
+            set_block(target_x, target_y, target_z, 0);
+        }
+        left_lock = true;
+    }
+    if (!mouse_left()) { left_lock = false; }
+
+    if (mouse_right() and !right_lock) {
+        if (place_x >= 0 and get_block(place_x, place_y, place_z) == 0) {
+            if (!player_blocked(place_x + 0.5, place_y + 1.8, place_z + 0.5)) {
+                set_block(place_x, place_y, place_z, palette[selected]);
+            }
+        }
+        right_lock = true;
+    }
+    if (!mouse_right()) { right_lock = false; }
+}
+
+fun select_blocks() {
+    if (key_lock) {
+        if (!key("1") and !key("2") and !key("3") and !key("4") and !key("5") and !key("6") and !key("7")) {
+            key_lock = false;
+        }
+        return null;
+    }
+    if (key("1")) { selected = 1; key_lock = true; }
+    if (key("2")) { selected = 2; key_lock = true; }
+    if (key("3")) { selected = 3; key_lock = true; }
+    if (key("4")) { selected = 4; key_lock = true; }
+    if (key("5")) { selected = 5; key_lock = true; }
+    if (key("6")) { selected = 6; key_lock = true; }
+    if (key("7")) { selected = 7; key_lock = true; }
+}
+
+fun update_input() {
+    select_blocks();
+    if (key("R")) { generate_world(); }
+    yaw += clamp(mouse_rel_x(), -30, 30) * 0.0032;
+    pitch -= clamp(mouse_rel_y(), -24, 24) * 0.0024;
+    pitch = clamp(pitch, -1.25, 1.25);
+    if (key("Left")) { yaw -= 0.0035 * delta_time; }
+    if (key("Right")) { yaw += 0.0035 * delta_time; }
+    if (key("Up")) { pitch += 0.0025 * delta_time; }
+    if (key("Down")) { pitch -= 0.0025 * delta_time; }
+    pitch = clamp(pitch, -1.25, 1.25);
+
+    let speed = 0.0052 * delta_time;
+    let dx = 0.0;
+    let dz = 0.0;
+    let pressed = 0;
+    if (key("W")) { dx += sin(yaw) * speed; dz += cos(yaw) * speed; pressed++; }
+    if (key("S")) { dx -= sin(yaw) * speed; dz -= cos(yaw) * speed; pressed++; }
+    if (key("A")) { dx -= cos(yaw) * speed; dz += sin(yaw) * speed; pressed++; }
+    if (key("D")) { dx += cos(yaw) * speed; dz -= sin(yaw) * speed; pressed++; }
+    if (pressed > 1) { dx *= 0.7071; dz *= 0.7071; }
+    move_player(dx, dz);
+    if (key("Space") and on_ground) {
+        vy = 0.145;
+        on_ground = false;
+    }
+}
+
+fun draw_sky() {
+    clear(126, 190, 238);
+    color(102, 168, 224);
+    rect(0, H / 2, W, H / 2);
+    color(84, 142, 92);
+    rect(0, H - 38, W, 38);
+}
+
+fun draw_icon(block_id, x, y, size) {
+    if (atlas != 0) {
+        let id = block_id - 1;
+        let sx = (id % 3) * TILE_SIZE;
+        let sy = floor(id / 3) * TILE_SIZE;
+        image_part(atlas, sx, sy, TILE_SIZE, TILE_SIZE, x, y, size, size);
+    } else {
+        color(180, 180, 180);
+        rect(x, y, size, size);
+    }
+}
+
+fun draw_hotbar() {
+    let x0 = W / 2 - 7 * 30 / 2;
+    let i = 1;
+    while (i <= 7) {
+        let x = x0 + (i - 1) * 30;
+        color(24, 26, 30, 210);
+        rect(x, H - 34, 26, 26);
+        draw_icon(palette[i], x + 3, H - 31, 20);
+        if (selected == i) {
+            color(255, 255, 255, 235);
+            rect_line(x - 2, H - 36, 30, 30);
+        }
+        i++;
+    }
+    color(255, 255, 255);
+    text(block_names[selected], 10, H - 23, 2);
+}
+
+fun draw_crosshair() {
+    if (frame_img != 0) {
+        image(frame_img, W / 2 - 12, H / 2 - 12, 24, 24);
+    } else {
+        color(255, 255, 255);
+        rect(W / 2 - 8, H / 2 - 1, 6, 2);
+        rect(W / 2 + 2, H / 2 - 1, 6, 2);
+        rect(W / 2 - 1, H / 2 - 8, 2, 6);
+        rect(W / 2 - 1, H / 2 + 2, 2, 6);
+    }
+    if (target_x >= 0) {
+        color(255, 255, 255, 120);
+        rect_line(W / 2 - 18, H / 2 - 18, 36, 36);
+    }
+}
+
+fun draw_debug() {
+    color(255, 255, 255);
+    text("faces " + str(faces), 10, 10, 1);
+}
+
+fun update_time() {
+    let now = ticks();
+    frame_started = now;
+    delta_time = now - last_ticks;
+    if (delta_time < 1) { delta_time = 1; }
+    if (delta_time > 40) { delta_time = 40; }
+    last_ticks = now;
+}
+
+fun frame_pace() {
+    let spent = ticks() - frame_started;
+    if (spent < 16) { delay(16 - spent); }
+}
+
+while (running()) {
+    poll();
+    if (key("Escape")) { quit(); }
+    update_time();
+    update_input();
+    update_physics();
+    edit_blocks();
+
+    draw_sky();
+    faces = voxel3d_render(world, WORLD_W, WORLD_H, WORLD_D, px, py, pz, yaw, pitch, FOV, atlas, TILE_SIZE, W, H, MAX_VIEW, 16000);
+    draw_crosshair();
+    draw_hotbar();
+    draw_debug();
+    present();
+    frame_pace();
+}

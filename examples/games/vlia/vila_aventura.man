@@ -1,0 +1,249 @@
+window("Vila Aventura", 800, 512);
+
+let W = 800;
+let H = 512;
+let TILE = 64;
+let MAP_W = 20;
+let MAP_H = 14;
+
+let tiles = image_load("tiles.png");
+let hero = image_load("sprite.png");
+let houses = image_load_key("constucoes.png", 94, 113, 73, 46);
+
+let grass = {x: 1098, y: 384, w: 160, h: 160};
+let path_h = {x: 615, y: 384, w: 154, h: 160};
+let path_v = {x: 230, y: 556, w: 186, h: 176};
+let path_cross = {x: 230, y: 384, w: 186, h: 160};
+let water = {x: 423, y: 32, w: 186, h: 176};
+
+let map = [
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,
+    0,0,0,0,1,0,0,0,0,2,0,0,0,0,0,1,0,0,0,0,
+    0,0,0,0,1,0,0,0,0,2,0,0,0,0,0,1,0,0,0,0,
+    0,0,0,0,1,0,0,0,0,2,0,0,0,0,0,1,0,0,0,0,
+    0,0,0,0,1,1,1,1,1,3,1,1,1,1,1,1,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,
+    4,4,4,4,0,0,0,0,0,2,0,0,0,0,4,4,4,4,4,4,
+    4,4,4,4,0,0,0,0,0,2,0,0,0,0,4,4,4,4,4,4,
+    4,4,4,4,0,0,0,0,0,2,0,0,0,0,4,4,4,4,4,4,
+    4,4,4,4,0,0,0,0,0,2,0,0,0,0,4,4,4,4,4,4
+];
+
+let buildings = [
+    {sx: 35, sy: 135, sw: 300, sh: 330, x: 96, y: 40, w: 192, h: 211, block: {x: 114, y: 170, w: 156, h: 78}},
+    {sx: 420, sy: 120, sw: 330, sh: 350, x: 640, y: 24, w: 218, h: 231, block: {x: 662, y: 174, w: 176, h: 84}},
+    {sx: 815, sy: 80, sw: 315, sh: 370, x: 942, y: 24, w: 205, h: 240, block: {x: 964, y: 172, w: 164, h: 92}},
+    {sx: 1180, sy: 90, sw: 315, sh: 390, x: 1058, y: 530, w: 208, h: 258, block: {x: 1082, y: 672, w: 160, h: 116}},
+    {sx: 45, sy: 610, sw: 300, sh: 330, x: 162, y: 560, w: 200, h: 220, block: {x: 184, y: 690, w: 156, h: 90}},
+    {sx: 420, sy: 570, sw: 350, sh: 360, x: 504, y: 560, w: 224, h: 230, block: {x: 528, y: 690, w: 176, h: 100}},
+    {sx: 820, sy: 610, sw: 330, sh: 330, x: 820, y: 566, w: 216, h: 216, block: {x: 844, y: 692, w: 168, h: 90}}
+];
+
+let gems = [];
+let px = 320;
+let py = 410;
+let dir = 0;
+let moving = false;
+let won = false;
+let hurt_flash = 0;
+
+fun reset_game() {
+    px = 320;
+    py = 410;
+    dir = 0;
+    won = false;
+    hurt_flash = 0;
+    gems = [
+        {x: 530, y: 250, got: false},
+        {x: 920, y: 410, got: false},
+        {x: 280, y: 500, got: false},
+        {x: 760, y: 760, got: false},
+        {x: 1160, y: 820, got: false}
+    ];
+}
+
+reset_game();
+
+fun tile_at(tx, ty) {
+    if (tx < 0 or ty < 0 or tx >= MAP_W or ty >= MAP_H) { return 4; }
+    return map[ty * MAP_W + tx];
+}
+
+fun water_at(x, y) {
+    return tile_at(floor(x / TILE), floor(y / TILE)) == 4;
+}
+
+fun point_in_rect(x, y, r) {
+    return x > r.x and x < r.x + r.w and y > r.y and y < r.y + r.h;
+}
+
+fun blocked(x, y) {
+    if (water_at(x, y)) { return true; }
+    let i = 0;
+    while (i < len(buildings)) {
+        if (point_in_rect(x, y, buildings[i].block)) { return true; }
+        i++;
+    }
+    return false;
+}
+
+fun try_move(dx, dy) {
+    let nx = px + dx;
+    let ny = py + dy;
+    if (!blocked(nx, py + 18)) { px = nx; }
+    if (!blocked(px, ny + 18)) { py = ny; }
+}
+
+fun gems_left() {
+    let left = 0;
+    let i = 0;
+    while (i < len(gems)) {
+        if (!gems[i].got) { left++; }
+        i++;
+    }
+    return left;
+}
+
+fun draw_tile(kind, x, y) {
+    image_part(tiles, grass.x, grass.y, grass.w, grass.h, x, y, TILE, TILE);
+    if (kind == 1) { image_part(tiles, path_h.x, path_h.y, path_h.w, path_h.h, x, y, TILE, TILE); }
+    if (kind == 2) { image_part(tiles, path_v.x, path_v.y, path_v.w, path_v.h, x, y, TILE, TILE); }
+    if (kind == 3) { image_part(tiles, path_cross.x, path_cross.y, path_cross.w, path_cross.h, x, y, TILE, TILE); }
+    if (kind == 4) { image_part(tiles, water.x, water.y, water.w, water.h, x, y, TILE, TILE); }
+}
+
+fun update_game() {
+    if (won) { return null; }
+    let speed = 3.1;
+    let dx = 0;
+    let dy = 0;
+    moving = false;
+    if (key("Left") or key("A")) { dx -= speed; dir = 1; moving = true; }
+    if (key("Right") or key("D")) { dx += speed; dir = 2; moving = true; }
+    if (key("Up") or key("W")) { dy -= speed; dir = 3; moving = true; }
+    if (key("Down") or key("S")) { dy += speed; dir = 0; moving = true; }
+    try_move(dx, dy);
+
+    let i = 0;
+    while (i < len(gems)) {
+        if (!gems[i].got) {
+            let gx = gems[i].x - px;
+            let gy = gems[i].y - py;
+            if (sqrt(gx * gx + gy * gy) < 34) { gems[i].got = true; }
+        }
+        i++;
+    }
+
+    if (gems_left() == 0 and px > 1140 and py > 610 and px < 1225 and py < 700) {
+        won = true;
+    }
+    if (hurt_flash > 0) { hurt_flash--; }
+}
+
+fun draw_world(cam_x, cam_y) {
+    let y = 0;
+    while (y < MAP_H) {
+        let x = 0;
+        while (x < MAP_W) {
+            draw_tile(tile_at(x, y), x * TILE - cam_x, y * TILE - cam_y);
+            x++;
+        }
+        y++;
+    }
+}
+
+fun draw_buildings(cam_x, cam_y) {
+    let i = 0;
+    while (i < len(buildings)) {
+        let b = buildings[i];
+        image_part(houses, b.sx, b.sy, b.sw, b.sh, b.x - cam_x, b.y - cam_y, b.w, b.h);
+        i++;
+    }
+}
+
+fun draw_gems(cam_x, cam_y) {
+    let pulse = floor(ticks() / 120) % 4;
+    let i = 0;
+    while (i < len(gems)) {
+        if (!gems[i].got) {
+            let sx = gems[i].x - cam_x;
+            let sy = gems[i].y - cam_y;
+            color(255, 210 + pulse * 10, 45);
+            rect(sx - 8, sy - 12, 16, 24);
+            color(255, 255, 150);
+            rect(sx - 4, sy - 8, 8, 8);
+        }
+        i++;
+    }
+}
+
+fun draw_player(cam_x, cam_y) {
+    let row = 0;
+    if (dir == 0) {
+        if (moving) { row = 1; }
+        else { row = 0; }
+    }
+    if (dir == 1) {
+        if (moving) { row = 3; }
+        else { row = 2; }
+    }
+    if (dir == 2) {
+        if (moving) { row = 5; }
+        else { row = 4; }
+    }
+    if (dir == 3) {
+        if (moving) { row = 7; }
+        else { row = 6; }
+    }
+    let frame = 0;
+    if (moving) { frame = floor(ticks() / 110) % 6; }
+    let sx = 76 + frame * 55;
+    let sy = row * 49;
+    if (row == 7) { sy = 346; }
+    image_part(hero, sx, sy, 48, 52, px - cam_x - 24, py - cam_y - 44, 48, 52);
+}
+
+fun draw_hud() {
+    color(8, 10, 15);
+    rect(0, 0, W, 36);
+    let left = gems_left();
+    let i = 0;
+    while (i < 5) {
+        if (i < 5 - left) { color(255, 220, 50); }
+        else { color(55, 55, 48); }
+        rect(18 + i * 22, 11, 14, 14);
+        i++;
+    }
+    if (left == 0) { color(40, 210, 90); }
+    else { color(80, 92, 76); }
+    rect(W - 116, 12, 92, 12);
+    if (won) {
+        color(20, 110, 50);
+        rect(W / 2 - 120, H / 2 - 38, 240, 76);
+        color(80, 240, 120);
+        rect(W / 2 - 94, H / 2 - 18, 188, 36);
+    }
+}
+
+while (running()) {
+    poll();
+    if (key("Escape")) { quit(); }
+    if (key("R")) { reset_game(); }
+    update_game();
+
+    let cam_x = clamp(px - W / 2, 0, MAP_W * TILE - W);
+    let cam_y = clamp(py - H / 2, 0, MAP_H * TILE - H);
+
+    clear(20, 26, 18);
+    draw_world(cam_x, cam_y);
+    draw_gems(cam_x, cam_y);
+    draw_buildings(cam_x, cam_y);
+    draw_player(cam_x, cam_y);
+    draw_hud();
+    present();
+    delay(16);
+}

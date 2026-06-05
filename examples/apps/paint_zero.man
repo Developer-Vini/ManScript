@@ -1,0 +1,47 @@
+window("Paint Zero", 720, 480);
+
+let dots = [];
+let brush = 8;
+let r = 70;
+let g = 180;
+let b = 255;
+
+fun add_dot(x, y) {
+    push(dots, {x: x, y: y, r: r, g: g, b: b, s: brush});
+    if (len(dots) > 1400) {
+        remove(dots, 0);
+    }
+}
+
+while (running()) {
+    poll();
+    if (key("Escape")) { quit(); }
+    if (key("1")) { r = 70; g = 180; b = 255; }
+    if (key("2")) { r = 255; g = 220; b = 70; }
+    if (key("3")) { r = 255; g = 90; b = 110; }
+    if (key("4")) { r = 90; g = 230; b = 120; }
+    if (key("Up")) { brush = min(28, brush + 1); }
+    if (key("Down")) { brush = max(2, brush - 1); }
+    if (key("C")) { dots = []; }
+    if (mouse_left()) { add_dot(mouse_x(), mouse_y()); }
+
+    clear(12, 14, 20);
+
+    let i = 0;
+    while (i < len(dots)) {
+        let d = dots[i];
+        color(d.r, d.g, d.b);
+        circle(d.x, d.y, d.s, 1);
+        i++;
+    }
+
+    color(32, 38, 52);
+    rect(0, 0, 720, 34);
+    color(r, g, b);
+    rect(12, 8, 44, 18);
+    color(230, 235, 245);
+    rect(70, 14, brush * 4, 6);
+
+    present();
+    delay(16);
+}

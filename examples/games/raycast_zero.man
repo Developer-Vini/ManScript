@@ -1,0 +1,410 @@
+# Raycast Zero - jogo 2.5D para ManScript Zero
+# Controles: W/S ou setas = andar, A/D = girar, Q/E = lateral, M = mapa, R = reiniciar, Esc = sair
+# Objetivo: pegue os cristais amarelos e entre na saida verde.
+
+window("Raycast Zero", 640, 400);
+
+let W = 640;
+let H = 400;
+let HH = 200;
+let COL = 2;
+let FOV = 1.0472;
+let HALF_FOV = 0.5236;
+let PDIST = 554.25;
+
+let MAP_W = 18;
+let MAP_H = 14;
+let MAP = [
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+    1,0,0,0,0,0,2,0,0,0,0,0,3,0,0,0,8,1,
+    1,0,2,2,2,0,2,0,3,3,3,0,3,0,2,0,0,1,
+    1,0,0,0,2,0,0,0,0,0,3,0,0,0,2,2,0,1,
+    1,2,2,0,2,2,2,0,2,0,3,3,2,0,0,0,0,1,
+    1,0,0,0,0,0,2,0,2,0,0,0,2,2,2,3,0,1,
+    1,0,3,3,3,0,0,0,2,2,2,0,0,0,0,3,0,1,
+    1,0,3,0,0,0,2,0,0,0,2,0,3,3,0,0,0,1,
+    1,0,3,0,2,2,2,2,3,0,0,0,0,3,2,2,0,1,
+    1,0,0,0,0,0,0,0,3,3,3,2,0,0,0,2,0,1,
+    1,2,2,2,3,3,0,2,2,0,0,2,2,2,0,2,0,1,
+    1,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,1,
+    1,0,2,2,0,3,3,3,2,0,3,0,2,2,2,0,0,1,
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+];
+
+let rays = [];
+let ri = 0;
+while (ri < W) {
+    push(rays, (ri / W - 0.5) * FOV);
+    ri += COL;
+}
+
+let px = 2.5;
+let py = 11.5;
+let ang = -0.75;
+let start_x = 2.5;
+let start_y = 11.5;
+let start_ang = -0.75;
+let move_speed = 0.055;
+let strafe_speed = 0.045;
+let rot_speed = 0.042;
+let show_map = true;
+let map_lock = false;
+let hurt_timer = 0;
+let won = false;
+
+let cores = [];
+let drones = [];
+
+fun map_at(x, y) {
+    if (x < 0 or y < 0 or x >= MAP_W or y >= MAP_H) { return 1; }
+    return MAP[y * MAP_W + x];
+}
+
+fun solid(x, y) {
+    let t = map_at(x, y);
+    if (t == 0 or t == 8) { return false; }
+    return true;
+}
+
+fun reset_game() {
+    px = start_x;
+    py = start_y;
+    ang = start_ang;
+    hurt_timer = 0;
+    won = false;
+    cores = [
+        {x: 5.5, y: 1.5, got: false},
+        {x: 15.5, y: 3.5, got: false},
+        {x: 6.5, y: 10.5, got: false},
+        {x: 13.5, y: 11.5, got: false}
+    ];
+    drones = [
+        {x: 9.5, y: 5.5, base: 9.5, axis: 1, dir: 1, span: 2.2, phase: 0},
+        {x: 3.5, y: 8.5, base: 8.5, axis: 0, dir: -1, span: 1.8, phase: 0},
+        {x: 14.5, y: 6.5, base: 14.5, axis: 1, dir: 1, span: 1.6, phase: 0}
+    ];
+}
+
+reset_game();
+
+fun cores_left() {
+    let n = 0;
+    let i = 0;
+    while (i < len(cores)) {
+        if (!cores[i].got) { n += 1; }
+        i++;
+    }
+    return n;
+}
+
+fun try_move(dx, dy) {
+    let nx = px + dx;
+    let ny = py + dy;
+    if (!solid(floor(nx), floor(py))) { px = nx; }
+    if (!solid(floor(px), floor(ny))) { py = ny; }
+}
+
+fun cast_ray(rel) {
+    let ra = ang + rel;
+    let rdx = cos(ra);
+    let rdy = sin(ra);
+    let mx = floor(px);
+    let my = floor(py);
+    let ddx = 99999.0;
+    let ddy = 99999.0;
+    if (abs(rdx) > 0.00001) { ddx = abs(1.0 / rdx); }
+    if (abs(rdy) > 0.00001) { ddy = abs(1.0 / rdy); }
+
+    let step_x = 1;
+    let step_y = 1;
+    let side_x = 0.0;
+    let side_y = 0.0;
+    if (rdx < 0) { step_x = -1; side_x = (px - mx) * ddx; }
+    else { side_x = (mx + 1.0 - px) * ddx; }
+    if (rdy < 0) { step_y = -1; side_y = (py - my) * ddy; }
+    else { side_y = (my + 1.0 - py) * ddy; }
+
+    let side = 0;
+    let tile = 0;
+    let hit = false;
+    let steps = 0;
+    while (!hit and steps < 32) {
+        if (side_x < side_y) {
+            side_x += ddx;
+            mx += step_x;
+            side = 0;
+        } else {
+            side_y += ddy;
+            my += step_y;
+            side = 1;
+        }
+        tile = map_at(mx, my);
+        if (tile > 0) { hit = true; }
+        steps++;
+    }
+
+    let dist = side_y - ddy;
+    if (side == 0) { dist = side_x - ddx; }
+    if (dist < 0.04) { dist = 0.04; }
+    return {dist: dist, side: side, tile: tile};
+}
+
+fun wall_color(tile, side, fog) {
+    let r = 88;
+    let g = 92;
+    let b = 104;
+    if (tile == 2) { r = 126; g = 60; b = 68; }
+    if (tile == 3) { r = 48; g = 96; b = 122; }
+    if (tile == 8) { r = 30; g = 178; b = 82; }
+    if (side == 1) {
+        r *= 0.66;
+        g *= 0.66;
+        b *= 0.66;
+    }
+    color(floor(r * fog), floor(g * fog), floor(b * fog));
+}
+
+fun draw_world() {
+    color(18, 22, 34);
+    rect(0, 0, W, HH);
+    color(47, 41, 36);
+    rect(0, HH, W, HH);
+
+    let x = 0;
+    let i = 0;
+    while (x < W) {
+        let rel = rays[i];
+        let hit = cast_ray(rel);
+        let perp = hit.dist * cos(rel);
+        if (perp < 0.05) { perp = 0.05; }
+        let wall_h = floor(PDIST / perp);
+        let y0 = max(0, HH - wall_h / 2);
+        let y1 = min(H, HH + wall_h / 2);
+        let fog = clamp(1.0 - perp / 13.0, 0.12, 1.0);
+        wall_color(hit.tile, hit.side, fog);
+        rect(x, y0, COL, y1 - y0);
+
+        let stripe = floor((x + floor(perp * 12)) % 24);
+        if (stripe < 2 and hit.tile != 8) {
+            color(floor(18 * fog), floor(20 * fog), floor(24 * fog));
+            rect(x, y0, COL, y1 - y0);
+        }
+        x += COL;
+        i++;
+    }
+}
+
+fun draw_billboard(sx, sy, kind) {
+    let dx = sx - px;
+    let dy = sy - py;
+    let dist = sqrt(dx * dx + dy * dy);
+    if (dist < 0.25) { return null; }
+
+    let sang = atan2(dy, dx);
+    let da = sang - ang;
+    while (da > 3.14159) { da -= 6.28318; }
+    while (da < -3.14159) { da += 6.28318; }
+    if (abs(da) > HALF_FOV + 0.25) { return null; }
+
+    let perp = dist * cos(da);
+    if (perp < 0.1) { return null; }
+    let wall = cast_ray(da);
+    let wall_perp = wall.dist * cos(da);
+    if (wall_perp + 0.08 < perp) { return null; }
+
+    let size = floor(PDIST / perp * 0.55);
+    let cx = floor((0.5 + da / FOV) * W);
+    let x0 = cx - size / 2;
+    let y0 = HH - size / 2;
+    let fog = clamp(1.0 - perp / 13.0, 0.15, 1.0);
+    let x = max(0, x0);
+    while (x < min(W, x0 + size)) {
+        let u = (x - x0) / size;
+        if (kind == 0) {
+            if (u > 0.18 and u < 0.82) {
+                color(floor(245 * fog), floor(200 * fog), floor(34 * fog));
+                rect(x, y0 + size * 0.18, COL, size * 0.64);
+                color(floor(255 * fog), floor(255 * fog), floor(120 * fog));
+                rect(x, y0 + size * 0.36, COL, size * 0.16);
+            }
+        } else {
+            if (u > 0.12 and u < 0.88) {
+                color(floor(184 * fog), floor(42 * fog), floor(62 * fog));
+                rect(x, y0 + size * 0.16, COL, size * 0.68);
+                if (u > 0.34 and u < 0.66) {
+                    color(floor(255 * fog), floor(150 * fog), floor(150 * fog));
+                    rect(x, y0 + size * 0.30, COL, size * 0.18);
+                }
+            }
+        }
+        x += COL;
+    }
+}
+
+fun draw_sprites() {
+    let i = 0;
+    while (i < len(drones)) {
+        draw_billboard(drones[i].x, drones[i].y, 1);
+        i++;
+    }
+    i = 0;
+    while (i < len(cores)) {
+        if (!cores[i].got) { draw_billboard(cores[i].x, cores[i].y, 0); }
+        i++;
+    }
+}
+
+fun update_input() {
+    if (key("Left") or key("A")) { ang -= rot_speed; }
+    if (key("Right") or key("D")) { ang += rot_speed; }
+    if (ang < 0) { ang += 6.28318; }
+    if (ang > 6.28318) { ang -= 6.28318; }
+
+    if (key("Up") or key("W")) { try_move(cos(ang) * move_speed, sin(ang) * move_speed); }
+    if (key("Down") or key("S")) { try_move(-cos(ang) * move_speed, -sin(ang) * move_speed); }
+    if (key("Q")) { try_move(cos(ang - 1.5708) * strafe_speed, sin(ang - 1.5708) * strafe_speed); }
+    if (key("E")) { try_move(cos(ang + 1.5708) * strafe_speed, sin(ang + 1.5708) * strafe_speed); }
+
+    if (key("M") and !map_lock) {
+        show_map = !show_map;
+        map_lock = true;
+    }
+    if (!key("M")) { map_lock = false; }
+}
+
+fun update_game() {
+    if (won) { return null; }
+    update_input();
+
+    let i = 0;
+    while (i < len(cores)) {
+        if (!cores[i].got) {
+            let dx = cores[i].x - px;
+            let dy = cores[i].y - py;
+            if (sqrt(dx * dx + dy * dy) < 0.42) { cores[i].got = true; }
+        }
+        i++;
+    }
+
+    i = 0;
+    while (i < len(drones)) {
+        drones[i].phase += 0.025 * drones[i].dir;
+        if (drones[i].phase > drones[i].span) { drones[i].phase = drones[i].span; drones[i].dir = -1; }
+        if (drones[i].phase < -drones[i].span) { drones[i].phase = -drones[i].span; drones[i].dir = 1; }
+        if (drones[i].axis == 0) { drones[i].y = drones[i].base + drones[i].phase; }
+        else { drones[i].x = drones[i].base + drones[i].phase; }
+
+        let dx = drones[i].x - px;
+        let dy = drones[i].y - py;
+        if (sqrt(dx * dx + dy * dy) < 0.48) {
+            hurt_timer = 24;
+            px = start_x;
+            py = start_y;
+            ang = start_ang;
+        }
+        i++;
+    }
+
+    if (map_at(floor(px), floor(py)) == 8 and cores_left() == 0) { won = true; }
+    if (hurt_timer > 0) { hurt_timer--; }
+}
+
+fun draw_map() {
+    if (!show_map) { return null; }
+    let t = 7;
+    let ox = W - MAP_W * t - 8;
+    let oy = 8;
+    color(6, 8, 13);
+    rect(ox - 3, oy - 3, MAP_W * t + 6, MAP_H * t + 6);
+
+    let y = 0;
+    while (y < MAP_H) {
+        let x = 0;
+        while (x < MAP_W) {
+            let m = map_at(x, y);
+            if (m == 0) { color(26, 30, 38); }
+            else if (m == 8) { color(25, 160, 70); }
+            else if (m == 2) { color(110, 50, 58); }
+            else if (m == 3) { color(44, 82, 104); }
+            else { color(78, 82, 92); }
+            rect(ox + x * t, oy + y * t, t - 1, t - 1);
+            x++;
+        }
+        y++;
+    }
+
+    let i = 0;
+    while (i < len(cores)) {
+        if (!cores[i].got) {
+            color(255, 218, 64);
+            rect(ox + cores[i].x * t - 2, oy + cores[i].y * t - 2, 4, 4);
+        }
+        i++;
+    }
+    i = 0;
+    while (i < len(drones)) {
+        color(230, 60, 80);
+        rect(ox + drones[i].x * t - 2, oy + drones[i].y * t - 2, 4, 4);
+        i++;
+    }
+
+    color(90, 220, 255);
+    rect(ox + px * t - 2, oy + py * t - 2, 5, 5);
+    line(ox + px * t, oy + py * t, ox + px * t + cos(ang) * 9, oy + py * t + sin(ang) * 9);
+}
+
+fun draw_hud() {
+    color(7, 9, 15);
+    rect(0, H - 34, W, 34);
+    color(32, 42, 58);
+    rect(0, H - 34, W, 2);
+
+    let left = cores_left();
+    let i = 0;
+    while (i < 4) {
+        if (i < 4 - left) { color(255, 220, 50); }
+        else { color(48, 48, 42); }
+        rect(18 + i * 22, H - 23, 14, 14);
+        i++;
+    }
+
+    color(18, 50, 26);
+    rect(W - 92, H - 24, 72, 16);
+    if (left == 0) { color(40, 210, 90); }
+    else { color(70, 90, 80); }
+    rect(W - 88, H - 20, 64, 8);
+
+    color(180, 220, 255);
+    rect(W / 2 - 9, HH - 1, 7, 2);
+    rect(W / 2 + 2, HH - 1, 7, 2);
+    rect(W / 2 - 1, HH - 9, 2, 7);
+    rect(W / 2 - 1, HH + 2, 2, 7);
+
+    if (hurt_timer > 0) {
+        color(180, 20, 34);
+        rect(0, 0, W, 10);
+        rect(0, H - 44, W, 10);
+    }
+
+    if (won) {
+        color(20, 110, 50);
+        rect(W / 2 - 120, HH - 35, 240, 70);
+        color(80, 240, 120);
+        rect(W / 2 - 95, HH - 20, 190, 40);
+    }
+}
+
+while (running()) {
+    poll();
+    if (key("Escape")) { quit(); }
+    if (key("R")) { reset_game(); }
+
+    update_game();
+    draw_world();
+    draw_sprites();
+    draw_map();
+    draw_hud();
+
+    present();
+    delay(16);
+}

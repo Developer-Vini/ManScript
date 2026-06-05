@@ -1,0 +1,526 @@
+
+window("Guardiao da Vila", 800, 512);
+
+let W = 800;
+let H = 512;
+let TILE = 64;
+let MAP_W = 25;
+let MAP_H = 16;
+let WORLD_W = MAP_W * TILE;
+let WORLD_H = MAP_H * TILE;
+
+let ground_img = image_load("ground.png");
+let hero_img = image_load("hero.png");
+let enemy_img = image_load("enemies.png");
+let item_img = image_load("items.png");
+let hud_img = image_load("hud.png");
+let effect_img = image_load("effects.png");
+let tree_img = image_load("trees.png");
+let bush_img = image_load("bushes.png");
+let build_img = image_load("buildings.png");
+
+let map = [
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,3,3,3,0,0,0,0,0,0,0,0,3,3,3,0,0,0,0,0,
+    0,0,2,2,0,0,3,1,3,0,0,0,0,2,2,0,0,3,1,3,0,0,2,0,0,
+    0,0,2,1,1,1,1,1,1,1,1,1,1,1,2,0,0,3,1,3,0,0,2,0,0,
+    0,0,0,1,0,0,3,1,3,0,0,0,0,1,0,0,0,0,1,0,0,0,1,0,0,
+    0,0,0,1,0,0,3,1,3,0,0,4,0,1,0,0,0,0,1,0,0,0,1,0,0,
+    0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,
+    0,0,0,0,0,0,0,1,0,0,0,4,0,1,0,0,0,0,1,0,0,0,0,0,0,
+    0,0,2,2,0,0,0,1,0,2,0,0,0,1,0,2,2,0,1,0,0,2,2,0,0,
+    0,0,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,0,0,
+    0,0,0,1,0,0,0,1,0,2,0,0,0,1,0,0,0,0,1,0,0,1,0,0,0,
+    0,0,0,1,0,0,0,1,0,0,0,4,0,1,0,0,0,0,1,0,0,1,0,0,0,
+    0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,
+    0,0,0,0,0,0,3,3,3,0,0,0,0,0,0,0,0,3,3,3,0,0,0,0,0,
+    0,0,2,2,0,0,3,3,3,0,0,2,2,0,0,2,0,3,3,3,0,0,2,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+];
+
+let player = {x: 160, y: 212, w: 28, h: 28, hp: 5, max_hp: 5, dir: 0, moving: false, inv: 0, attack: 0};
+let coins = [];
+let hearts = [];
+let enemies = [];
+let props = [];
+let effects = [];
+let score = 0;
+let has_gem = false;
+let won = false;
+let game_over = false;
+let portal_pulse = 0;
+
+fun add_prop(sprite, x, y, w, h, bx, by, bw, bh) {
+    push(props, {sprite: sprite, x: x, y: y, w: w, h: h, bx: bx, by: by, bw: bw, bh: bh});
+}
+
+fun add_coin(x, y) {
+    push(coins, {x: x, y: y, kind: 0, got: false});
+}
+
+fun add_enemy(kind, x, y, home_x, home_y) {
+    push(enemies, {kind: kind, x: x, y: y, hp: 2 + kind, alive: true, home_x: home_x, home_y: home_y, hit: 0, phase: rand(80)});
+}
+
+fun reset_game() {
+    player = {x: 160, y: 212, w: 28, h: 28, hp: 5, max_hp: 5, dir: 0, moving: false, inv: 0, attack: 0};
+    coins = [];
+    hearts = [];
+    enemies = [];
+    props = [];
+    effects = [];
+    score = 0;
+    has_gem = false;
+    won = false;
+    game_over = false;
+    portal_pulse = 0;
+
+    add_coin(430, 220);
+    add_coin(900, 170);
+    add_coin(1280, 360);
+    add_coin(330, 645);
+    add_coin(720, 810);
+    add_coin(1350, 820);
+
+    add_enemy(0, 500, 400, 500, 400);
+    add_enemy(0, 860, 300, 860, 300);
+    add_enemy(1, 1120, 420, 1120, 420);
+    add_enemy(1, 430, 770, 430, 770);
+    add_enemy(2, 1010, 760, 1010, 760);
+    add_enemy(2, 1340, 680, 1340, 680);
+
+    add_prop(0, 48, 64, 96, 96, 66, 122, 60, 32);
+    add_prop(1, 650, 56, 96, 96, 668, 114, 60, 34);
+    add_prop(2, 1050, 42, 96, 96, 1068, 102, 60, 36);
+    add_prop(3, 1375, 408, 88, 88, 1392, 466, 52, 30);
+    add_prop(4, 100, 704, 96, 96, 118, 762, 60, 34);
+    add_prop(2, 1150, 742, 96, 96, 1168, 802, 60, 36);
+
+    push(props, {sprite: 4, x: 760, y: 424, w: 64, h: 64, bx: 776, by: 468, bw: 32, bh: 22});
+
+    let i = 0;
+    while (i < 18) {
+        add_prop(10 + (i % 8), 60 + i * 84, 890 + rand(20), 64, 80, 72 + i * 84, 936, 40, 34);
+        i++;
+    }
+    add_prop(10, 40, 360, 64, 80, 52, 408, 40, 34);
+    add_prop(11, 1450, 112, 64, 80, 1462, 160, 40, 34);
+    add_prop(12, 1480, 820, 64, 80, 1492, 868, 40, 34);
+}
+
+reset_game();
+
+fun tile_at(tx, ty) {
+    if (tx < 0 or ty < 0 or tx >= MAP_W or ty >= MAP_H) { return 3; }
+    return map[ty * MAP_W + tx];
+}
+
+fun rect_hit(ax, ay, aw, ah, bx, by, bw, bh) {
+    return ax < bx + bw and ax + aw > bx and ay < by + bh and ay + ah > by;
+}
+
+fun blocked_at(x, y) {
+    if (x < 8 or y < 8 or x > WORLD_W - 8 or y > WORLD_H - 8) { return true; }
+    let t = tile_at(floor(x / TILE), floor(y / TILE));
+    if (t == 3) { return true; }
+
+    let i = 0;
+    while (i < len(props)) {
+        let p = props[i];
+        if (rect_hit(x - 8, y - 8, 16, 16, p.bx, p.by, p.bw, p.bh)) { return true; }
+        i++;
+    }
+    return false;
+}
+
+fun player_center_x() { return player.x + player.w / 2; }
+fun player_center_y() { return player.y + player.h / 2; }
+
+fun try_move(dx, dy) {
+    let nx = player.x + dx;
+    let ny = player.y + dy;
+    if (!blocked_at(nx + player.w / 2, player.y + player.h - 4)) { player.x = nx; }
+    if (!blocked_at(player.x + player.w / 2, ny + player.h - 4)) { player.y = ny; }
+}
+
+fun spawn_effect(x, y) {
+    push(effects, {x: x, y: y, frame: 0, tick: 0});
+}
+
+fun damage_player() {
+    if (player.inv > 0 or won or game_over) { return null; }
+    player.hp--;
+    player.inv = 55;
+    if (player.hp <= 0) {
+        player.hp = 0;
+        game_over = true;
+    }
+}
+
+fun slash_rect() {
+    let sx = player_center_x() - 20;
+    let sy = player_center_y() - 20;
+    if (player.dir == 0) { sy += 28; }
+    if (player.dir == 1) { sx -= 32; }
+    if (player.dir == 2) { sx += 32; }
+    if (player.dir == 3) { sy -= 32; }
+    return {x: sx, y: sy, w: 40, h: 40};
+}
+
+fun update_player() {
+    if (won or game_over) { return null; }
+    let dx = 0;
+    let dy = 0;
+    let speed = 2.55;
+    player.moving = false;
+
+    if (key("Left") or key("A")) { dx -= speed; player.dir = 1; player.moving = true; }
+    if (key("Right") or key("D")) { dx += speed; player.dir = 2; player.moving = true; }
+    if (key("Up") or key("W")) { dy -= speed; player.dir = 3; player.moving = true; }
+    if (key("Down") or key("S")) { dy += speed; player.dir = 0; player.moving = true; }
+
+    try_move(dx, dy);
+
+    if (key("Space") and player.attack <= 0) {
+        player.attack = 18;
+        let s = slash_rect();
+        spawn_effect(s.x + s.w / 2 - 16, s.y + s.h / 2 - 16);
+        let i = 0;
+        while (i < len(enemies)) {
+            if (enemies[i].alive and rect_hit(s.x, s.y, s.w, s.h, enemies[i].x, enemies[i].y, 32, 32)) {
+                enemies[i].hp--;
+                enemies[i].hit = 18;
+                spawn_effect(enemies[i].x, enemies[i].y);
+                if (enemies[i].hp <= 0) {
+                    enemies[i].alive = false;
+                    score += 2;
+                    if (rand_int(3) == 0) {
+                        push(hearts, {x: enemies[i].x + 16, y: enemies[i].y + 16, got: false});
+                    }
+                }
+            }
+            i++;
+        }
+    }
+
+    if (player.attack > 0) { player.attack--; }
+    if (player.inv > 0) { player.inv--; }
+}
+
+fun update_coins() {
+    if (game_over) { return null; }
+    let i = 0;
+    while (i < len(coins)) {
+        if (!coins[i].got) {
+            let dx = coins[i].x - player_center_x();
+            let dy = coins[i].y - player_center_y();
+            if (sqrt(dx * dx + dy * dy) < 28) {
+                coins[i].got = true;
+                score++;
+                spawn_effect(coins[i].x - 16, coins[i].y - 16);
+            }
+        }
+        i++;
+    }
+}
+
+fun update_hearts() {
+    if (game_over or won) { return null; }
+    let i = 0;
+    while (i < len(hearts)) {
+        if (!hearts[i].got) {
+            let dx = hearts[i].x - player_center_x();
+            let dy = hearts[i].y - player_center_y();
+            if (sqrt(dx * dx + dy * dy) < 28 and player.hp < player.max_hp) {
+                hearts[i].got = true;
+                player.hp++;
+                spawn_effect(hearts[i].x - 16, hearts[i].y - 16);
+            }
+        }
+        i++;
+    }
+}
+
+fun coins_left() {
+    let n = 0;
+    let i = 0;
+    while (i < len(coins)) {
+        if (!coins[i].got) { n++; }
+        i++;
+    }
+    return n;
+}
+
+fun coins_got() {
+    return len(coins) - coins_left();
+}
+
+fun update_enemies() {
+    if (won or game_over) { return null; }
+    let i = 0;
+    while (i < len(enemies)) {
+        let e = enemies[i];
+        if (e.alive) {
+            e.phase += 0.02;
+            let pcx = player_center_x();
+            let pcy = player_center_y();
+            let ex = e.x + 16;
+            let ey = e.y + 16;
+            let dx = pcx - ex;
+            let dy = pcy - ey;
+            let dist = sqrt(dx * dx + dy * dy);
+            let vx = 0;
+            let vy = 0;
+            let speed = 0.7 + e.kind * 0.18;
+            if (dist < 260) {
+                if (dist > 1) {
+                    vx = dx / dist * speed;
+                    vy = dy / dist * speed;
+                }
+            } else {
+                vx = cos(e.phase) * 0.55;
+                vy = sin(e.phase * 0.7) * 0.55;
+            }
+
+            let nx = e.x + vx;
+            let ny = e.y + vy;
+            if (!blocked_at(nx + 16, e.y + 28)) { e.x = nx; }
+            if (!blocked_at(e.x + 16, ny + 28)) { e.y = ny; }
+
+            if (rect_hit(player.x + 4, player.y + 6, player.w - 8, player.h - 6, e.x + 5, e.y + 7, 22, 22)) {
+                damage_player();
+            }
+            if (e.hit > 0) { e.hit--; }
+        }
+        i++;
+    }
+}
+
+fun update_effects() {
+    let i = 0;
+    while (i < len(effects)) {
+        effects[i].tick++;
+        if (effects[i].tick > 3) {
+            effects[i].tick = 0;
+            effects[i].frame++;
+        }
+        if (effects[i].frame > 7) { remove(effects, i); }
+        else { i++; }
+    }
+}
+
+fun update_goal() {
+    if (game_over) { return null; }
+    if (!has_gem and coins_left() == 0) {
+        let gx = 1472 - player_center_x();
+        let gy = 160 - player_center_y();
+        if (sqrt(gx * gx + gy * gy) < 42) {
+            has_gem = true;
+            score += 5;
+            spawn_effect(1456, 144);
+        }
+    }
+    if (has_gem) {
+        let fx = 792 - player_center_x();
+        let fy = 456 - player_center_y();
+        if (sqrt(fx * fx + fy * fy) < 42) {
+            won = true;
+            spawn_effect(776, 440);
+        }
+    }
+}
+
+fun update_game() {
+    portal_pulse++;
+    update_player();
+    update_enemies();
+    update_coins();
+    update_hearts();
+    update_goal();
+    update_effects();
+}
+
+fun draw_ground_tile(kind, x, y) {
+    let sx = 0;
+    let sy = 0;
+    if (kind == 0) { sx = 0; sy = 0; }
+    if (kind == 1) { sx = 32; sy = 0; }
+    if (kind == 2) { sx = 64; sy = 0; }
+    if (kind == 3) { sx = 96; sy = 0; }
+    if (kind == 4) { sx = 0; sy = 32; }
+    image_part(ground_img, sx, sy, 32, 32, x, y, TILE, TILE);
+}
+
+fun draw_world(cam_x, cam_y) {
+    let y = 0;
+    while (y < MAP_H) {
+        let x = 0;
+        while (x < MAP_W) {
+            draw_ground_tile(tile_at(x, y), x * TILE - cam_x, y * TILE - cam_y);
+            x++;
+        }
+        y++;
+    }
+}
+
+fun draw_props_layer(cam_x, cam_y, front) {
+    let foot = player.y + player.h;
+    let i = 0;
+    while (i < len(props)) {
+        let p = props[i];
+        let prop_front = p.by + p.bh > foot;
+        if (prop_front == front) {
+            if (p.sprite < 10) {
+                let sx = p.sprite * 64;
+                image_part(build_img, sx, 0, 64, 96, p.x - cam_x, p.y - cam_y, p.w, p.h);
+            } else {
+                let n = p.sprite - 10;
+                let sx2 = (n % 4) * 64;
+                let sy2 = floor(n / 4) * 80;
+                image_part(tree_img, sx2, sy2, 64, 80, p.x - cam_x, p.y - cam_y, p.w, p.h);
+            }
+        }
+        i++;
+    }
+}
+
+fun draw_bushes(cam_x, cam_y) {
+    let i = 0;
+    while (i < 12) {
+        let bx = 250 + i * 95;
+        let by = 560 + (i % 3) * 34;
+        image_part(bush_img, (i % 6) * 32, 0, 32, 32, bx - cam_x, by - cam_y, 48, 48);
+        i++;
+    }
+}
+
+fun draw_items(cam_x, cam_y) {
+    let pulse = floor(ticks() / 120) % 2;
+    let i = 0;
+    while (i < len(coins)) {
+        if (!coins[i].got) {
+            image_part(item_img, 0, 0, 24, 24, coins[i].x - 16 - cam_x, coins[i].y - 18 - cam_y - pulse, 32, 32);
+        }
+        i++;
+    }
+    i = 0;
+    while (i < len(hearts)) {
+        if (!hearts[i].got) {
+            image_part(item_img, 24, 0, 24, 24, hearts[i].x - 15 - cam_x, hearts[i].y - 17 - cam_y, 30, 30);
+        }
+        i++;
+    }
+    if (!has_gem and coins_left() == 0) {
+        image_part(item_img, 48, 0, 24, 24, 1456 - cam_x, 144 - cam_y - pulse * 2, 40, 40);
+    }
+}
+
+fun draw_enemies(cam_x, cam_y) {
+    let frame = floor(ticks() / 130) % 4;
+    let i = 0;
+    while (i < len(enemies)) {
+        let e = enemies[i];
+        if (e.alive) {
+            let sx = frame * 32 + e.kind * 128;
+            let sy = 0;
+            if (e.hit > 0) { color(255, 80, 80); rect(e.x - cam_x, e.y - cam_y, 32, 32); }
+            image_part(enemy_img, sx, sy, 32, 32, e.x - cam_x, e.y - cam_y, 48, 48);
+        }
+        i++;
+    }
+}
+
+fun draw_player(cam_x, cam_y) {
+    let frame = 0;
+    if (player.moving) { frame = floor(ticks() / 110) % 4; }
+    let sx = frame * 32;
+    let sy = player.dir * 32;
+    if (player.inv % 8 < 4) {
+        image_part(hero_img, sx, sy, 32, 32, player.x - 10 - cam_x, player.y - 18 - cam_y, 48, 48);
+    }
+
+    if (player.attack > 6) {
+        let s = slash_rect();
+        color(255, 245, 170, 170);
+        rect(s.x - cam_x, s.y - cam_y, s.w, s.h);
+    }
+}
+
+fun draw_effects(cam_x, cam_y) {
+    let i = 0;
+    while (i < len(effects)) {
+        image_part(effect_img, effects[i].frame * 32, 0, 32, 32, effects[i].x - cam_x, effects[i].y - cam_y, 48, 48);
+        i++;
+    }
+}
+
+fun draw_goal(cam_x, cam_y) {
+    if (coins_left() == 0 and !has_gem) {
+        color(60, 140, 255);
+        circle(1476 - cam_x, 164 - cam_y, 22 + floor(sin(portal_pulse * 0.08) * 3), 0);
+    }
+    if (has_gem and !won) {
+        color(60, 230, 120);
+        circle(792 - cam_x, 456 - cam_y, 24 + floor(sin(portal_pulse * 0.08) * 3), 0);
+    }
+}
+
+fun draw_hud() {
+    image(hud_img, 8, 8, 256, 48);
+    let i = 0;
+    while (i < player.max_hp) {
+        if (i < player.hp) { image_part(item_img, 24, 0, 24, 24, 22 + i * 30, 20, 24, 24); }
+        else { color(55, 35, 42); rect(25 + i * 30, 24, 18, 16); }
+        i++;
+    }
+    color(50, 220, 80);
+    rect(16, 46, min(150, score * 10), 8);
+
+    i = 0;
+    let got = coins_got();
+    while (i < 6) {
+        if (i < got) { image_part(item_img, 0, 0, 24, 24, W - 190 + i * 26, 18, 22, 22); }
+        else { color(60, 54, 34); rect(W - 186 + i * 26, 23, 14, 14); }
+        i++;
+    }
+    if (has_gem) { image_part(item_img, 48, 0, 24, 24, W - 34, 17, 26, 26); }
+
+    if (game_over) {
+        color(95, 16, 28);
+        rect(W / 2 - 150, H / 2 - 46, 300, 92);
+        color(255, 110, 120);
+        rect(W / 2 - 112, H / 2 - 18, 224, 36);
+    }
+    if (won) {
+        color(16, 100, 48);
+        rect(W / 2 - 170, H / 2 - 50, 340, 100);
+        color(90, 245, 130);
+        rect(W / 2 - 132, H / 2 - 22, 264, 44);
+    }
+}
+
+while (running()) {
+    poll();
+    if (key("Escape")) { quit(); }
+    if (key("R")) { reset_game(); }
+
+    update_game();
+
+    let cam_x = clamp(player_center_x() - W / 2, 0, WORLD_W - W);
+    let cam_y = clamp(player_center_y() - H / 2, 0, WORLD_H - H);
+
+    clear(10, 16, 13);
+    draw_world(cam_x, cam_y);
+    draw_goal(cam_x, cam_y);
+    draw_bushes(cam_x, cam_y);
+    draw_props_layer(cam_x, cam_y, false);
+    draw_items(cam_x, cam_y);
+    draw_enemies(cam_x, cam_y);
+    draw_player(cam_x, cam_y);
+    draw_props_layer(cam_x, cam_y, true);
+    draw_effects(cam_x, cam_y);
+    draw_hud();
+
+    present();
+    delay(16);
+}

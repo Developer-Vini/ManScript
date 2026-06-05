@@ -1,0 +1,372 @@
+window("Pixel Studio Zero", 900, 600);
+
+let W = 900;
+let H = 600;
+let GRID = 32;
+let CELL = 14;
+let CANVAS_X = 244;
+let CANVAS_Y = 72;
+let CANVAS_SIZE = GRID * CELL;
+
+let TOOL_BRUSH = 0;
+let TOOL_ERASE = 1;
+let TOOL_FILL = 2;
+let TOOL_PICK = 3;
+let tool = TOOL_BRUSH;
+
+let brush = 1;
+let selected = 1;
+let mirror = false;
+let show_grid = true;
+let mouse_lock = false;
+let action_down = false;
+let key_z_lock = false;
+let key_c_lock = false;
+let key_m_lock = false;
+let key_g_lock = false;
+let undo_stack = [];
+
+let palette = [
+    {r: 0, g: 0, b: 0},
+    {r: 255, g: 255, b: 255},
+    {r: 224, g: 54, b: 74},
+    {r: 255, g: 160, b: 55},
+    {r: 255, g: 223, b: 90},
+    {r: 75, g: 195, b: 95},
+    {r: 52, g: 154, b: 219},
+    {r: 106, g: 90, b: 205},
+    {r: 226, g: 92, b: 190},
+    {r: 118, g: 75, b: 45},
+    {r: 82, g: 92, b: 110},
+    {r: 170, g: 182, b: 190},
+    {r: 18, g: 24, b: 38},
+    {r: 45, g: 64, b: 89},
+    {r: 117, g: 230, b: 178},
+    {r: 255, g: 244, b: 190}
+];
+
+let pixels = [];
+
+fun init_pixels() {
+    pixels = [];
+    let i = 0;
+    while (i < GRID * GRID) {
+        push(pixels, 0);
+        i++;
+    }
+}
+
+init_pixels();
+
+fun idx(x, y) {
+    return y * GRID + x;
+}
+
+fun in_grid(x, y) {
+    return x >= 0 and y >= 0 and x < GRID and y < GRID;
+}
+
+fun clone_pixels() {
+    let out = [];
+    let i = 0;
+    while (i < len(pixels)) {
+        push(out, pixels[i]);
+        i++;
+    }
+    return out;
+}
+
+fun push_undo() {
+    push(undo_stack, clone_pixels());
+    if (len(undo_stack) > 16) { remove(undo_stack, 0); }
+}
+
+fun undo() {
+    if (len(undo_stack) > 0) {
+        pixels = pop(undo_stack);
+    }
+}
+
+fun set_pixel(x, y, c) {
+    if (in_grid(x, y)) {
+        pixels[idx(x, y)] = c;
+    }
+}
+
+fun paint_cell(cx, cy, c) {
+    let r = brush - 1;
+    let y = cy - r;
+    while (y <= cy + r) {
+        let x = cx - r;
+        while (x <= cx + r) {
+            if (abs(x - cx) + abs(y - cy) <= r + 1) {
+                set_pixel(x, y, c);
+                if (mirror) { set_pixel(GRID - 1 - x, y, c); }
+            }
+            x++;
+        }
+        y++;
+    }
+}
+
+fun flood_fill(sx, sy, new_color) {
+    if (!in_grid(sx, sy)) { return null; }
+    let old = pixels[idx(sx, sy)];
+    if (old == new_color) { return null; }
+
+    let qx = [sx];
+    let qy = [sy];
+    let qi = 0;
+    while (qi < len(qx)) {
+        let x = qx[qi];
+        let y = qy[qi];
+        qi++;
+        if (in_grid(x, y) and pixels[idx(x, y)] == old) {
+            pixels[idx(x, y)] = new_color;
+            push(qx, x + 1); push(qy, y);
+            push(qx, x - 1); push(qy, y);
+            push(qx, x); push(qy, y + 1);
+            push(qx, x); push(qy, y - 1);
+        }
+    }
+}
+
+fun mouse_cell_x() {
+    return floor((mouse_x() - CANVAS_X) / CELL);
+}
+
+fun mouse_cell_y() {
+    return floor((mouse_y() - CANVAS_Y) / CELL);
+}
+
+fun mouse_on_canvas() {
+    return mouse_x() >= CANVAS_X and mouse_y() >= CANVAS_Y and mouse_x() < CANVAS_X + CANVAS_SIZE and mouse_y() < CANVAS_Y + CANVAS_SIZE;
+}
+
+fun color_at(i) {
+    return palette[i];
+}
+
+fun use_color(i) {
+    selected = clamp(i, 0, len(palette) - 1);
+    tool = TOOL_BRUSH;
+}
+
+fun clear_canvas() {
+    push_undo();
+    init_pixels();
+}
+
+fun handle_palette_click() {
+    let start_x = 32;
+    let start_y = 86;
+    let sw = 38;
+    let i = 0;
+    while (i < len(palette)) {
+        let px = start_x + (i % 4) * 44;
+        let py = start_y + floor(i / 4) * 44;
+        if (mouse_x() >= px and mouse_y() >= py and mouse_x() < px + sw and mouse_y() < py + sw) {
+            use_color(i);
+        }
+        i++;
+    }
+}
+
+fun handle_tool_click() {
+    let x = 32;
+    let y = 304;
+    let s = 42;
+    if (mouse_x() >= x and mouse_x() < x + s and mouse_y() >= y and mouse_y() < y + s) { tool = TOOL_BRUSH; }
+    if (mouse_x() >= x + 50 and mouse_x() < x + 50 + s and mouse_y() >= y and mouse_y() < y + s) { tool = TOOL_ERASE; }
+    if (mouse_x() >= x + 100 and mouse_x() < x + 100 + s and mouse_y() >= y and mouse_y() < y + s) { tool = TOOL_FILL; }
+    if (mouse_x() >= x + 150 and mouse_x() < x + 150 + s and mouse_y() >= y and mouse_y() < y + s) { tool = TOOL_PICK; }
+
+    y = 360;
+    if (mouse_x() >= x and mouse_x() < x + s and mouse_y() >= y and mouse_y() < y + s) { brush = max(1, brush - 1); }
+    if (mouse_x() >= x + 50 and mouse_x() < x + 50 + s and mouse_y() >= y and mouse_y() < y + s) { brush = min(5, brush + 1); }
+    if (mouse_x() >= x + 100 and mouse_x() < x + 100 + s and mouse_y() >= y and mouse_y() < y + s) { mirror = !mirror; }
+    if (mouse_x() >= x + 150 and mouse_x() < x + 150 + s and mouse_y() >= y and mouse_y() < y + s) { show_grid = !show_grid; }
+
+    y = 416;
+    if (mouse_x() >= x and mouse_x() < x + s and mouse_y() >= y and mouse_y() < y + s) { undo(); }
+    if (mouse_x() >= x + 50 and mouse_x() < x + 50 + s and mouse_y() >= y and mouse_y() < y + s) { clear_canvas(); }
+}
+
+fun handle_input() {
+    if (key("Escape")) { quit(); }
+    if (key("B")) { tool = TOOL_BRUSH; }
+    if (key("E")) { tool = TOOL_ERASE; }
+    if (key("F")) { tool = TOOL_FILL; }
+    if (key("I")) { tool = TOOL_PICK; }
+    if (key("M") and !key_m_lock) { mirror = !mirror; key_m_lock = true; }
+    if (!key("M")) { key_m_lock = false; }
+    if (key("G") and !key_g_lock) { show_grid = !show_grid; key_g_lock = true; }
+    if (!key("G")) { key_g_lock = false; }
+    if (key("C") and !key_c_lock) { clear_canvas(); key_c_lock = true; }
+    if (!key("C")) { key_c_lock = false; }
+    if (key("Z") and !key_z_lock) { undo(); key_z_lock = true; }
+    if (!key("Z")) { key_z_lock = false; }
+    if (key("Up")) { brush = min(5, brush + 1); }
+    if (key("Down")) { brush = max(1, brush - 1); }
+
+    if (mouse_left()) {
+        if (!mouse_lock) {
+            handle_palette_click();
+            handle_tool_click();
+            if (mouse_on_canvas()) {
+                push_undo();
+                action_down = true;
+                let cx = mouse_cell_x();
+                let cy = mouse_cell_y();
+                if (tool == TOOL_FILL) { flood_fill(cx, cy, selected); }
+                else if (tool == TOOL_PICK) { selected = pixels[idx(cx, cy)]; tool = TOOL_BRUSH; }
+                else if (tool == TOOL_ERASE) { paint_cell(cx, cy, 0); }
+                else { paint_cell(cx, cy, selected); }
+            }
+        } else if (action_down and mouse_on_canvas()) {
+            let cx2 = mouse_cell_x();
+            let cy2 = mouse_cell_y();
+            if (tool == TOOL_ERASE) { paint_cell(cx2, cy2, 0); }
+            else if (tool == TOOL_BRUSH) { paint_cell(cx2, cy2, selected); }
+        }
+        mouse_lock = true;
+    } else {
+        mouse_lock = false;
+        action_down = false;
+    }
+}
+
+fun draw_icon_button(x, y, active) {
+    if (active) { color(75, 112, 160); }
+    else { color(30, 38, 54); }
+    rect(x, y, 42, 42);
+    color(90, 104, 130);
+    rect_line(x, y, 42, 42);
+}
+
+fun draw_ui() {
+    color(16, 20, 30);
+    rect(0, 0, W, H);
+    color(24, 30, 44);
+    rect(0, 0, 220, H);
+    rect(CANVAS_X - 14, CANVAS_Y - 14, CANVAS_SIZE + 28, CANVAS_SIZE + 28);
+
+    let i = 0;
+    while (i < len(palette)) {
+        let p = palette[i];
+        let px = 32 + (i % 4) * 44;
+        let py = 86 + floor(i / 4) * 44;
+        color(p.r, p.g, p.b);
+        rect(px, py, 38, 38);
+        if (i == selected) { color(255, 255, 255); rect_line(px - 3, py - 3, 44, 44); }
+        else { color(65, 76, 96); rect_line(px, py, 38, 38); }
+        i++;
+    }
+
+    let pc = color_at(selected);
+    color(pc.r, pc.g, pc.b);
+    rect(32, 34, 64, 32);
+    color(230, 235, 245);
+    rect_line(32, 34, 64, 32);
+
+    draw_icon_button(32, 304, tool == TOOL_BRUSH);
+    color(255, 255, 255); circle(53, 325, 8);
+
+    draw_icon_button(82, 304, tool == TOOL_ERASE);
+    color(240, 120, 130); rect(96, 318, 16, 12);
+    color(255, 220, 225); rect(100, 314, 16, 12);
+
+    draw_icon_button(132, 304, tool == TOOL_FILL);
+    color(255, 220, 80); rect(146, 318, 20, 14);
+    color(255, 180, 60); rect(152, 312, 12, 12);
+
+    draw_icon_button(182, 304, tool == TOOL_PICK);
+    color(100, 210, 255); line(193, 334, 213, 314);
+    circle(211, 314, 5);
+
+    draw_icon_button(32, 360, false);
+    color(230, 235, 245); rect(44, 380, 18, 4);
+
+    draw_icon_button(82, 360, false);
+    color(230, 235, 245); rect(94, 380, 18, 4); rect(101, 373, 4, 18);
+
+    draw_icon_button(132, 360, mirror);
+    color(120, 220, 255); rect(144, 370, 7, 22); rect(165, 370, 7, 22);
+    color(80, 95, 120); rect(158, 367, 2, 28);
+
+    draw_icon_button(182, 360, show_grid);
+    color(200, 210, 225);
+    line(193, 371, 213, 371); line(193, 383, 213, 383);
+    line(199, 367, 199, 391); line(211, 367, 211, 391);
+
+    draw_icon_button(32, 416, false);
+    color(230, 235, 245); line(59, 428, 45, 428); line(45, 428, 52, 421); line(45, 428, 52, 435);
+
+    draw_icon_button(82, 416, false);
+    color(235, 82, 96); rect(96, 428, 16, 16); color(30, 38, 54); rect(100, 432, 8, 8);
+
+    color(55, 65, 84);
+    rect(32, 490, 150, 12);
+    color(110, 180, 255);
+    rect(32, 490, brush * 30, 12);
+}
+
+fun draw_canvas() {
+    color(38, 42, 52);
+    rect(CANVAS_X, CANVAS_Y, CANVAS_SIZE, CANVAS_SIZE);
+
+    let y = 0;
+    while (y < GRID) {
+        let x = 0;
+        while (x < GRID) {
+            let p = color_at(pixels[idx(x, y)]);
+            color(p.r, p.g, p.b);
+            rect(CANVAS_X + x * CELL, CANVAS_Y + y * CELL, CELL, CELL);
+            x++;
+        }
+        y++;
+    }
+
+    if (show_grid) {
+        color(40, 48, 62);
+        let g = 0;
+        while (g <= GRID) {
+            line(CANVAS_X + g * CELL, CANVAS_Y, CANVAS_X + g * CELL, CANVAS_Y + CANVAS_SIZE);
+            line(CANVAS_X, CANVAS_Y + g * CELL, CANVAS_X + CANVAS_SIZE, CANVAS_Y + g * CELL);
+            g++;
+        }
+    }
+    color(180, 196, 220);
+    rect_line(CANVAS_X - 1, CANVAS_Y - 1, CANVAS_SIZE + 2, CANVAS_SIZE + 2);
+}
+
+fun draw_preview() {
+    let ox = 730;
+    let oy = 82;
+    let s = 4;
+    color(24, 30, 44);
+    rect(704, 52, 164, 164);
+    let y = 0;
+    while (y < GRID) {
+        let x = 0;
+        while (x < GRID) {
+            let p = color_at(pixels[idx(x, y)]);
+            color(p.r, p.g, p.b);
+            rect(ox + x * s, oy + y * s, s, s);
+            x++;
+        }
+        y++;
+    }
+    color(170, 185, 210);
+    rect_line(ox - 1, oy - 1, GRID * s + 2, GRID * s + 2);
+}
+
+while (running()) {
+    poll();
+    handle_input();
+    draw_ui();
+    draw_canvas();
+    draw_preview();
+    present();
+    delay(16);
+}

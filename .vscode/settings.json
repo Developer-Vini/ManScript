@@ -1,0 +1,7 @@
+{
+  "files.associations": {
+    "*.man": "manscript"
+  },
+  "manscript.consoleExecutable": "bin/mz.exe",
+  "manscript.sdlExecutable": "bin/mz_sdl.exe"
+}

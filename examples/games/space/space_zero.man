@@ -1,0 +1,645 @@
+window("Space Zero", 640, 720);
+
+let W = 640;
+let H = 720;
+
+let stars = [];
+fun init_stars() {
+    stars = [];
+    let i = 0;
+    while (i < 120) {
+        push(stars, {
+            x: rand_int(W),
+            y: rand_int(H),
+            spd: 0.5 + rand(2.5),
+            bright: 80 + rand_int(176)
+        });
+        i++;
+    }
+}
+
+let particles = [];
+fun spawn_explosion(cx, cy, cor_r, cor_g, cor_b) {
+    let i = 0;
+    while (i < 18) {
+        let ang = (i / 18.0) * PI * 2;
+        let spd = 1.5 + rand(3.5);
+        push(particles, {
+            x: cx, y: cy,
+            vx: cos(ang) * spd,
+            vy: sin(ang) * spd,
+            life: 22 + rand_int(14),
+            max_life: 36,
+            r: cor_r, g: cor_g, b: cor_b,
+            sz: 2 + rand_int(4)
+        });
+        i++;
+    }
+}
+
+fun update_particles() {
+    let i = 0;
+    while (i < len(particles)) {
+        let p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vx *= 0.92;
+        p.vy *= 0.92;
+        p.life--;
+        if (p.life <= 0) {
+            remove(particles, i);
+        } else {
+            i++;
+        }
+    }
+}
+
+fun draw_particles() {
+    let i = 0;
+    while (i < len(particles)) {
+        let p = particles[i];
+        let alpha_f = p.life / p.max_life;
+        let br = floor(p.r * alpha_f);
+        let bg = floor(p.g * alpha_f);
+        let bb = floor(p.b * alpha_f);
+        color(br, bg, bb);
+        let sz = floor(p.sz * alpha_f) + 1;
+        rect(floor(p.x - sz/2), floor(p.y - sz/2), sz, sz);
+        i++;
+    }
+}
+
+let bullets = [];
+fun shoot(px, py) {
+    push(bullets, {x: px, y: py - 16, w: 4, h: 14, speed: 11});
+}
+
+fun update_bullets() {
+    let i = 0;
+    while (i < len(bullets)) {
+        bullets[i].y -= bullets[i].speed;
+        if (bullets[i].y < -20) {
+            remove(bullets, i);
+        } else {
+            i++;
+        }
+    }
+}
+
+fun draw_bullets() {
+    let i = 0;
+    while (i < len(bullets)) {
+        let b = bullets[i];
+        color(180, 255, 255);
+        rect(b.x - 2, b.y, 4, b.h);
+        color(80, 200, 255);
+        rect(b.x - 1, b.y - 4, 2, 4);
+        i++;
+    }
+}
+
+let enemy_bullets = [];
+fun enemy_shoot(ex, ey) {
+    push(enemy_bullets, {x: ex, y: ey + 10, w: 6, h: 10, speed: 4});
+}
+
+fun update_enemy_bullets() {
+    let i = 0;
+    while (i < len(enemy_bullets)) {
+        enemy_bullets[i].y += enemy_bullets[i].speed;
+        if (enemy_bullets[i].y > H + 20) {
+            remove(enemy_bullets, i);
+        } else {
+            i++;
+        }
+    }
+}
+
+fun draw_enemy_bullets() {
+    let i = 0;
+    while (i < len(enemy_bullets)) {
+        let b = enemy_bullets[i];
+        color(255, 80, 60);
+        rect(b.x - 3, b.y, 6, b.h);
+        color(255, 200, 80);
+        rect(b.x - 1, b.y + 2, 2, 4);
+        i++;
+    }
+}
+
+let enemies = [];
+let wave = 1;
+let wave_timer = 0;
+let wave_delay = 180;
+let wave_spawned = false;
+
+fun make_enemy(ex, ey, tipo) {
+    if (tipo == 0) {
+        return {x: ex, y: ey, w: 38, h: 28, hp: 2, max_hp: 2,
+                vx: 1.2, vy: 1.0, tipo: 0,
+                shoot_cd: 90 + rand_int(60), shoot_timer: rand_int(90),
+                phase: rand(PI * 2)};
+    }
+    if (tipo == 1) {
+        return {x: ex, y: ey, w: 28, h: 22, hp: 1, max_hp: 1,
+                vx: 2.5, vy: 2.5, tipo: 1,
+                shoot_cd: 60 + rand_int(40), shoot_timer: rand_int(60),
+                phase: rand(PI * 2)};
+    }
+    # tipo 2
+    return {x: ex, y: ey, w: 50, h: 38, hp: 6, max_hp: 6,
+            vx: 0.6, vy: 0.5, tipo: 2,
+            shoot_cd: 45 + rand_int(20), shoot_timer: rand_int(45),
+            phase: rand(PI * 2)};
+}
+
+fun spawn_wave(w) {
+    enemies = [];
+    let count = 4 + w * 2;
+    if (count > 18) { count = 18; }
+    let i = 0;
+    while (i < count) {
+        let tipo = 0;
+        if (w >= 2 and rand_int(3) == 0) { tipo = 1; }
+        if (w >= 3 and rand_int(5) == 0) { tipo = 2; }
+        let ex = 60 + rand_int(W - 120);
+        let ey = -40 - rand_int(200);
+        push(enemies, make_enemy(ex, ey, tipo));
+        i++;
+    }
+}
+
+fun update_enemies(tick) {
+    let i = 0;
+    while (i < len(enemies)) {
+        let e = enemies[i];
+        if (e.tipo == 0) {
+            e.x += sin(tick * 0.04 + e.phase) * e.vx;
+            e.y += e.vy * 0.6;
+        }
+        if (e.tipo == 1) {
+            e.x += cos(tick * 0.07 + e.phase) * e.vx;
+            e.y += e.vy * 0.8;
+        }
+        if (e.tipo == 2) {
+            e.x += sin(tick * 0.025 + e.phase) * e.vx;
+            e.y += e.vy * 0.4;
+        }
+        e.x = clamp(e.x, 10, W - e.w - 10);
+        e.shoot_timer++;
+        if (e.shoot_timer >= e.shoot_cd and e.y > 0) {
+            enemy_shoot(e.x + e.w / 2, e.y + e.h);
+            e.shoot_timer = 0;
+        }
+        if (e.y > H + 60) {
+            remove(enemies, i);
+        } else {
+            i++;
+        }
+    }
+}
+
+fun draw_enemy_basic(e) {
+    let x = floor(e.x);
+    let y = floor(e.y);
+    let w = e.w;
+    let h = e.h;
+    color(200, 60, 180);
+    rect(x + 4, y + 6, w - 8, h - 10);
+    color(160, 30, 140);
+    rect(x, y + 10, 10, h - 14);
+    rect(x + w - 10, y + 10, 10, h - 14);
+    color(255, 120, 220);
+    rect(x + w/2 - 5, y, 10, 10);
+    color(255, 80, 80);
+    rect(x + w/2 - 4, y + h - 6, 8, 6);
+    let hp_w = floor((e.hp / e.max_hp) * w);
+    color(50, 220, 80);
+    rect(x, y - 6, hp_w, 3);
+    color(80, 60, 60);
+    rect(x + hp_w, y - 6, w - hp_w, 3);
+}
+
+fun draw_enemy_fast(e) {
+    let x = floor(e.x);
+    let y = floor(e.y);
+    let w = e.w;
+    let h = e.h;
+    color(255, 160, 0);
+    rect(x + 6, y + 4, w - 12, h - 8);
+    color(220, 100, 0);
+    rect(x, y + 8, 8, h - 12);
+    rect(x + w - 8, y + 8, 8, h - 12);
+    color(255, 220, 100);
+    rect(x + w/2 - 4, y, 8, 8);
+    color(255, 60, 0);
+    rect(x + w/2 - 3, y + h - 5, 6, 5);
+    let hp_w = floor((e.hp / e.max_hp) * w);
+    color(50, 220, 80);
+    rect(x, y - 6, hp_w, 3);
+}
+
+fun draw_enemy_tank(e) {
+    let x = floor(e.x);
+    let y = floor(e.y);
+    let w = e.w;
+    let h = e.h;
+    color(80, 180, 255);
+    rect(x + 4, y + 4, w - 8, h - 8);
+    color(40, 100, 200);
+    rect(x, y + 10, 12, h - 16);
+    rect(x + w - 12, y + 10, 12, h - 16);
+    color(160, 220, 255);
+    rect(x + w/2 - 8, y + 4, 16, 14);
+    # 2 motores
+    color(0, 200, 255);
+    rect(x + 8, y + h - 7, 10, 7);
+    rect(x + w - 18, y + h - 7, 10, 7);
+    let hp_w = floor((e.hp / e.max_hp) * w);
+    color(50, 220, 80);
+    rect(x, y - 8, hp_w, 4);
+    color(80, 60, 60);
+    rect(x + hp_w, y - 8, w - hp_w, 4);
+}
+
+fun draw_enemies() {
+    let i = 0;
+    while (i < len(enemies)) {
+        let e = enemies[i];
+        if (e.tipo == 0) { draw_enemy_basic(e); }
+        if (e.tipo == 1) { draw_enemy_fast(e); }
+        if (e.tipo == 2) { draw_enemy_tank(e); }
+        i++;
+    }
+}
+
+let player = {x: W/2 - 20, y: H - 110, w: 40, h: 38, speed: 5, hp: 5, max_hp: 5};
+let shoot_cd = 14;
+let shoot_timer = 0;
+let shoot_lock = false;
+let invincible = 0;
+
+fun draw_player(p) {
+    let x = floor(p.x);
+    let y = floor(p.y);
+    let pulse = floor(ticks() / 80) % 2;
+    color(255, 140, 0);
+    rect(x + 10, y + p.h - 2, 8, 10 + pulse * 4);
+    rect(x + p.w - 18, y + p.h - 2, 8, 10 + pulse * 4);
+    color(255, 220, 80);
+    rect(x + 13, y + p.h - 2, 4, 6 + pulse * 2);
+    rect(x + p.w - 17, y + p.h - 2, 4, 6 + pulse * 2);
+    if (invincible > 0 and (floor(ticks() / 60) % 2) == 0) {
+        color(200, 200, 255);
+    } else {
+        color(60, 200, 255);
+    }
+    rect(x + 10, y + 6, p.w - 20, p.h - 10);
+    color(30, 130, 220);
+    rect(x, y + 16, 12, p.h - 20);
+    rect(x + p.w - 12, y + 16, 12, p.h - 20);
+    color(200, 240, 255);
+    rect(x + p.w/2 - 4, y, 8, 10);
+    rect(x + 2, y + 10, 8, 8);
+    rect(x + p.w - 10, y + 10, 8, 8);
+    color(140, 230, 255);
+    rect(x + p.w/2 - 6, y + 6, 12, 10);
+    color(220, 250, 255);
+    rect(x + p.w/2 - 4, y + 8, 8, 6);
+}
+
+fun aabb(ax, ay, aw, ah, bx, by, bw, bh) {
+    return ax < bx + bw and ax + aw > bx and ay < by + bh and ay + ah > by;
+}
+
+fun draw_hud(score, w) {
+    let i = 0;
+    while (i < player.max_hp) {
+        if (i < player.hp) {
+            color(80, 255, 120);
+        } else {
+            color(50, 60, 50);
+        }
+        let hx = 16 + i * 22;
+        let hy = H - 30;
+        rect(hx + 2, hy, 7, 5);
+        rect(hx + 9, hy, 7, 5);
+        rect(hx, hy + 2, 18, 5);
+        rect(hx + 2, hy + 7, 14, 3);
+        rect(hx + 4, hy + 10, 10, 2);
+        rect(hx + 6, hy + 12, 6, 2);
+        rect(hx + 8, hy + 14, 2, 2);
+        i++;
+    }
+    color(255, 220, 80);
+    let ww = w * 24;
+    if (ww > 200) { ww = 200; }
+    rect(W - 220, H - 30, ww, 8);
+    color(100, 80, 30);
+    rect(W - 220 + ww, H - 30, 200 - ww, 8);
+    color(80, 200, 255);
+    let sw = floor(score / 10);
+    if (sw > 300) { sw = 300; }
+    rect(W/2 - 150, H - 24, sw, 6);
+}
+
+fun draw_score_big(score) {
+    color(255, 220, 60);
+    rect(W/2 - 60, 18, score % 100 * 2, 10);
+}
+
+fun draw_bg(tick) {
+    color(15, 8, 30);
+    rect(0, 0, W, H);
+    let nb_x = (tick * 0.3) % (W + 200) - 100;
+    color(30, 10, 55);
+    circle(floor(nb_x), 180, 120, 1);
+    color(20, 8, 45);
+    circle(W - floor(nb_x) + 60, 420, 90, 1);
+    color(10, 5, 35);
+    circle(W/2, 300, 160, 1);
+}
+
+fun draw_stars(tick) {
+    let i = 0;
+    while (i < len(stars)) {
+        let s = stars[i];
+        s.y = s.y + s.spd;
+        if (s.y > H) { s.y = -2; s.x = rand_int(W); }
+        let br = floor(s.bright);
+        color(br, br, br + 20);
+        if (s.spd > 2) {
+            rect(floor(s.x), floor(s.y), 2, 4);
+        } else {
+            point(floor(s.x), floor(s.y));
+        }
+        i++;
+    }
+}
+
+fun draw_title() {
+
+    color(80, 200, 255);
+    rect(160, 180, 40, 8); rect(160, 195, 8, 20);
+    rect(160, 215, 40, 8); rect(192, 223, 8, 20);
+    rect(160, 243, 40, 8);
+    rect(210, 180, 8, 70); rect(210, 180, 30, 8);
+    rect(210, 215, 30, 8); rect(232, 188, 8, 27);
+    rect(250, 250, 8, -70); rect(290, 250, 8, -70);
+    rect(250, 180, 40, 8); rect(252, 215, 36, 8);
+    rect(305, 180, 40, 8); rect(305, 180, 8, 70);
+    rect(305, 243, 40, 8);
+    rect(355, 180, 8, 70); rect(355, 180, 40, 8);
+    rect(355, 215, 35, 8); rect(355, 243, 40, 8);
+
+    color(255, 140, 60);
+    rect(155, 290, 50, 8); rect(155, 290, 8, 8);
+    rect(155 + 42, 290 + 42, 8, 8);
+    let zx = 0;
+    while (zx < 5) {
+        rect(155 + 8 + zx * 7, 290 + 8 + zx * 8, 8, 8);
+        zx++;
+    }
+    rect(155, 340, 50, 8);
+    rect(215, 290, 8, 60); rect(215, 290, 40, 8);
+    rect(215, 315, 35, 8); rect(215, 340, 40, 8);
+    rect(265, 290, 8, 60); rect(265, 290, 30, 8);
+    rect(265, 315, 30, 8); rect(287, 315, 8, 35);
+    rect(275, 323, 10, 8);
+    rect(305, 290, 40, 8); rect(305, 290, 8, 60);
+    rect(337, 290, 8, 60); rect(305, 340, 40, 8);
+
+    color(180, 255, 180);
+    rect(170, 390, 300, 6);
+    color(200, 200, 200);
+    rect(195, 410, 250, 8);
+    color(100, 200, 255);
+    rect(230, 435, 40, 10);
+    rect(275, 435, 90, 10);
+    color(80, 80, 80);
+    rect(210, 435, 18, 8);
+    color(220, 220, 60);
+    rect(373, 435, 55, 8);
+    rect(375, 447, 51, 8);
+    color(180, 140, 255);
+    rect(215, 460, 210, 6);
+}
+
+fun draw_gameover(score) {
+    color(100, 20, 20);
+    rect(W/2 - 200, H/2 - 80, 400, 160);
+    color(200, 40, 40);
+    rect(W/2 - 198, H/2 - 78, 396, 156);
+    color(255, 80, 80);
+    rect(W/2 - 150, H/2 - 50, 300, 12);
+    color(255, 200, 100);
+    rect(W/2 - 120, H/2 - 20, score % 100 * 2, 10);
+    color(180, 180, 180);
+    rect(W/2 - 80, H/2 + 20, 160, 8);
+    color(100, 220, 255);
+    rect(W/2 - 60, H/2 + 40, 120, 8);
+}
+
+fun draw_wave_banner(w) {
+    color(20, 80, 20);
+    rect(W/2 - 120, H/2 - 30, 240, 60);
+    color(80, 255, 100);
+    rect(W/2 - 118, H/2 - 28, 236, 56);
+    color(20, 60, 20);
+    rect(W/2 - 100, H/2 - 10, 200, 20);
+    color(200, 255, 200);
+    let bw = w * 30;
+    if (bw > 180) { bw = 180; }
+    rect(W/2 - 90, H/2 - 5, bw, 10);
+}
+
+let state = "title";
+let tick = 0;
+let score = 0;
+let space_lock = false;
+let r_lock = false;
+
+init_stars();
+
+while (running()) {
+    poll();
+    if (key("Escape")) { quit(); }
+    tick++;
+
+    if (state == "title") {
+        draw_bg(tick);
+        draw_stars(tick);
+
+        let dy = sin(tick * 0.04) * 8;
+        let fp = {x: W/2 - 20, y: 500 + floor(dy), w: 40, h: 38, hp: 5, max_hp: 5};
+        invincible = 0;
+        draw_player(fp);
+        color(180, 255, 255);
+        rect(W/2 - 2, 480 + floor(dy), 4, 14);
+        color(80, 200, 255);
+        rect(W/2 - 1, 470 + floor(dy), 2, 8);
+
+        draw_title();
+
+        if (key("Space") and !space_lock) {
+            state = "wave_start";
+            wave = 1;
+            score = 0;
+            player.hp = player.max_hp;
+            player.x = W/2 - 20;
+            player.y = H - 110;
+            bullets = [];
+            enemy_bullets = [];
+            enemies = [];
+            particles = [];
+            wave_timer = 0;
+            wave_spawned = false;
+            space_lock = true;
+        }
+        if (!key("Space")) { space_lock = false; }
+    }
+
+    if (state == "wave_start") {
+        draw_bg(tick);
+        draw_stars(tick);
+        draw_player(player);
+        draw_wave_banner(wave);
+        wave_timer++;
+        if (!wave_spawned) {
+            spawn_wave(wave);
+            wave_spawned = true;
+        }
+        if (wave_timer > 90) {
+            state = "play";
+            wave_timer = 0;
+        }
+    }
+
+    if (state == "play") {
+        if (key("Left") or key("A")) { player.x -= player.speed; }
+        if (key("Right") or key("D")) { player.x += player.speed; }
+        if (key("Up") or key("W")) { player.y -= player.speed; }
+        if (key("Down") or key("S")) { player.y += player.speed; }
+        player.x = clamp(player.x, 0, W - player.w);
+        player.y = clamp(player.y, 60, H - player.h - 40);
+
+        shoot_timer++;
+        if (key("Space") and shoot_timer >= shoot_cd) {
+            shoot(player.x + player.w/2 - 2, player.y);
+            shoot_timer = 0;
+        }
+
+        if (invincible > 0) { invincible--; }
+
+        update_bullets();
+        update_enemy_bullets();
+        update_enemies(tick);
+        update_particles();
+
+        let bi = 0;
+        while (bi < len(bullets)) {
+            let b = bullets[bi];
+            let hit_any = false;
+            let ei = 0;
+            while (ei < len(enemies)) {
+                let e = enemies[ei];
+                if (aabb(b.x - 2, b.y, b.w, b.h, e.x, e.y, e.w, e.h)) {
+                    e.hp--;
+                    if (e.tipo == 0) { spawn_explosion(e.x + e.w/2, e.y + e.h/2, 255, 80, 200); }
+                    if (e.tipo == 1) { spawn_explosion(e.x + e.w/2, e.y + e.h/2, 255, 180, 30); }
+                    if (e.tipo == 2) { spawn_explosion(e.x + e.w/2, e.y + e.h/2, 60, 200, 255); }
+                    if (e.hp <= 0) {
+                        if (e.tipo == 0) { score += 10; }
+                        if (e.tipo == 1) { score += 15; }
+                        if (e.tipo == 2) { score += 40; spawn_explosion(e.x + e.w/2, e.y + e.h/2, 60, 200, 255); }
+                        remove(enemies, ei);
+                    } else {
+                        ei++;
+                    }
+                    hit_any = true;
+                    break;
+                }
+                ei++;
+            }
+            if (hit_any) {
+                remove(bullets, bi);
+            } else {
+                bi++;
+            }
+        }
+
+        if (invincible <= 0) {
+            let ebi = 0;
+            while (ebi < len(enemy_bullets)) {
+                let eb = enemy_bullets[ebi];
+                if (aabb(eb.x - 3, eb.y, eb.w, eb.h, player.x, player.y, player.w, player.h)) {
+                    player.hp--;
+                    spawn_explosion(player.x + player.w/2, player.y + player.h/2, 60, 180, 255);
+                    invincible = 80;
+                    remove(enemy_bullets, ebi);
+                    if (player.hp <= 0) {
+                        spawn_explosion(player.x + player.w/2, player.y + player.h/2, 60, 180, 255);
+                        spawn_explosion(player.x + player.w/2, player.y, 255, 255, 200);
+                        state = "gameover";
+                    }
+                } else {
+                    ebi++;
+                }
+            }
+        }
+
+        if (invincible <= 0) {
+            let ei2 = 0;
+            while (ei2 < len(enemies)) {
+                let e = enemies[ei2];
+                if (aabb(e.x, e.y, e.w, e.h, player.x + 4, player.y + 4, player.w - 8, player.h - 8)) {
+                    player.hp--;
+                    spawn_explosion(player.x + player.w/2, player.y + player.h/2, 60, 180, 255);
+                    invincible = 80;
+                    if (player.hp <= 0) {
+                        state = "gameover";
+                    }
+                }
+                ei2++;
+            }
+        }
+
+        if (len(enemies) == 0 and state == "play") {
+            wave++;
+            wave_spawned = false;
+            wave_timer = 0;
+            state = "wave_start";
+        }
+
+        draw_bg(tick);
+        draw_stars(tick);
+        draw_enemies();
+        draw_player(player);
+        draw_bullets();
+        draw_enemy_bullets();
+        draw_particles();
+        draw_hud(score, wave);
+    }
+
+    if (state == "gameover") {
+        update_particles();
+        draw_bg(tick);
+        draw_stars(tick);
+        draw_particles();
+        draw_gameover(score);
+
+        if (key("R") and !r_lock) {
+            state = "title";
+            bullets = [];
+            enemy_bullets = [];
+            enemies = [];
+            particles = [];
+            player.hp = player.max_hp;
+            r_lock = true;
+        }
+        if (!key("R")) { r_lock = false; }
+    }
+
+    present();
+    delay(16);
+}

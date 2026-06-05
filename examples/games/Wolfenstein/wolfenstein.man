@@ -1,0 +1,889 @@
+# .\bin\mz_sdl.exe .\examples\games\Wolfenstein\wolfenstein.man
+
+window("Wolfenstein Zero", 1600, 900);
+logical_size(800, 450, true);
+mouse_relative(true);
+
+let WIDTH = 800;
+let HEIGHT = 450;
+let HALF_WIDTH = 400;
+let HALF_HEIGHT = 225;
+let FOV = 1.04719755;
+let HALF_FOV = 0.52359877;
+let TWO_PI = 6.2831853;
+let SCREEN_DIST = 692.82;
+let SCALE = 2;
+let NUM_RAYS = 400;
+let MAX_DEPTH = 20;
+let TEXTURE_SIZE = 256;
+let PLAYER_SIZE_SCALE = 60;
+let MOUSE_SENSITIVITY = 0.0032;
+let MOUSE_MAX_REL = 28;
+let MOUSE_SMOOTH = 0.55;
+let FRAME_TARGET = 16;
+
+let MAP_W = 16;
+let MAP_H = 32;
+let MAP = [
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+    1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+    1,0,0,3,3,3,3,0,0,0,2,2,2,0,0,1,
+    1,0,0,0,0,0,4,0,0,0,0,0,2,0,0,1,
+    1,0,0,0,0,0,4,0,0,0,0,0,2,0,0,1,
+    1,0,0,3,3,3,3,0,0,0,0,0,0,0,0,1,
+    1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+    1,0,0,0,4,0,0,0,4,0,0,0,0,0,0,1,
+    1,1,1,3,1,3,1,1,1,3,0,0,3,1,1,1,
+    1,1,1,1,1,1,1,1,1,3,0,0,3,1,1,1,
+    1,1,1,1,1,1,1,1,1,3,0,0,3,1,1,1,
+    1,1,3,1,1,1,1,1,1,3,0,0,3,1,1,1,
+    1,4,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+    3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+    1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+    1,0,0,2,0,0,0,0,0,3,4,0,4,3,0,1,
+    1,0,0,5,0,0,0,0,0,0,3,0,3,0,0,1,
+    1,0,0,2,0,0,0,0,0,0,0,0,0,0,0,1,
+    1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+    3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+    1,4,0,0,0,0,0,0,4,0,0,4,0,0,0,1,
+    1,1,3,3,0,0,3,3,1,3,3,1,3,1,1,1,
+    1,1,1,3,0,0,3,1,1,1,1,1,1,1,1,1,
+    1,3,3,4,0,0,4,3,3,3,3,3,3,3,3,1,
+    3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,
+    3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,
+    3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,
+    3,0,0,5,0,0,0,5,0,0,0,5,0,0,0,3,
+    3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,
+    3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,
+    3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,
+    3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3
+];
+
+let BASE = "examples/games/Wolfenstein/resources/";
+let tex = [
+    0,
+    image_load(BASE + "textures/1.png"),
+    image_load(BASE + "textures/2.png"),
+    image_load(BASE + "textures/3.png"),
+    image_load(BASE + "textures/4.png"),
+    image_load(BASE + "textures/5.png")
+];
+let sky = image_load(BASE + "textures/sky.png");
+let blood = image_load(BASE + "textures/blood_screen.png");
+let game_over_img = image_load(BASE + "textures/game_over.png");
+let win_img = image_load(BASE + "textures/win.png");
+let digits = [
+    image_load(BASE + "textures/digits/0.png"),
+    image_load(BASE + "textures/digits/1.png"),
+    image_load(BASE + "textures/digits/2.png"),
+    image_load(BASE + "textures/digits/3.png"),
+    image_load(BASE + "textures/digits/4.png"),
+    image_load(BASE + "textures/digits/5.png"),
+    image_load(BASE + "textures/digits/6.png"),
+    image_load(BASE + "textures/digits/7.png"),
+    image_load(BASE + "textures/digits/8.png"),
+    image_load(BASE + "textures/digits/9.png"),
+    image_load(BASE + "textures/digits/10.png")
+];
+
+let green_light = [
+    image_load(BASE + "sprites/animated_sprites/green_light/0.png"),
+    image_load(BASE + "sprites/animated_sprites/green_light/1.png"),
+    image_load(BASE + "sprites/animated_sprites/green_light/3.png"),
+    image_load(BASE + "sprites/animated_sprites/green_light/4.png")
+];
+let red_light = [
+    image_load(BASE + "sprites/animated_sprites/red_light/0.png"),
+    image_load(BASE + "sprites/animated_sprites/red_light/1.png"),
+    image_load(BASE + "sprites/animated_sprites/red_light/2.png"),
+    image_load(BASE + "sprites/animated_sprites/red_light/3.png")
+];
+let candle = image_load(BASE + "sprites/static_sprites/candlebra.png");
+
+let soldier_idle = [
+    image_load(BASE + "sprites/npc/soldier/idle/0.png"),
+    image_load(BASE + "sprites/npc/soldier/idle/1.png"),
+    image_load(BASE + "sprites/npc/soldier/idle/2.png"),
+    image_load(BASE + "sprites/npc/soldier/idle/3.png"),
+    image_load(BASE + "sprites/npc/soldier/idle/4.png"),
+    image_load(BASE + "sprites/npc/soldier/idle/5.png"),
+    image_load(BASE + "sprites/npc/soldier/idle/6.png"),
+    image_load(BASE + "sprites/npc/soldier/idle/7.png")
+];
+let soldier_walk = [
+    image_load(BASE + "sprites/npc/soldier/walk/0.png"),
+    image_load(BASE + "sprites/npc/soldier/walk/1.png"),
+    image_load(BASE + "sprites/npc/soldier/walk/2.png"),
+    image_load(BASE + "sprites/npc/soldier/walk/3.png")
+];
+let soldier_attack = [
+    image_load(BASE + "sprites/npc/soldier/attack/0.png"),
+    image_load(BASE + "sprites/npc/soldier/attack/1.png")
+];
+let soldier_pain = [image_load(BASE + "sprites/npc/soldier/pain/0.png")];
+let soldier_death = [
+    image_load(BASE + "sprites/npc/soldier/death/POSSM0.png"),
+    image_load(BASE + "sprites/npc/soldier/death/POSSN0.png"),
+    image_load(BASE + "sprites/npc/soldier/death/POSSO0.png"),
+    image_load(BASE + "sprites/npc/soldier/death/POSSP0.png"),
+    image_load(BASE + "sprites/npc/soldier/death/POSSQ0.png"),
+    image_load(BASE + "sprites/npc/soldier/death/POSSR0.png"),
+    image_load(BASE + "sprites/npc/soldier/death/POSSS0.png"),
+    image_load(BASE + "sprites/npc/soldier/death/POSST0.png"),
+    image_load(BASE + "sprites/npc/soldier/death/POSSU0.png")
+];
+
+let caco_idle = [
+    image_load(BASE + "sprites/npc/caco_demon/idle/0.png"),
+    image_load(BASE + "sprites/npc/caco_demon/idle/1.png"),
+    image_load(BASE + "sprites/npc/caco_demon/idle/2.png"),
+    image_load(BASE + "sprites/npc/caco_demon/idle/3.png"),
+    image_load(BASE + "sprites/npc/caco_demon/idle/4.png"),
+    image_load(BASE + "sprites/npc/caco_demon/idle/5.png"),
+    image_load(BASE + "sprites/npc/caco_demon/idle/6.png"),
+    image_load(BASE + "sprites/npc/caco_demon/idle/7.png")
+];
+let caco_walk = [
+    image_load(BASE + "sprites/npc/caco_demon/walk/0.png"),
+    image_load(BASE + "sprites/npc/caco_demon/walk/1.png"),
+    image_load(BASE + "sprites/npc/caco_demon/walk/2.png")
+];
+let caco_attack = [
+    image_load(BASE + "sprites/npc/caco_demon/attack/0.png"),
+    image_load(BASE + "sprites/npc/caco_demon/attack/1.png"),
+    image_load(BASE + "sprites/npc/caco_demon/attack/2.png"),
+    image_load(BASE + "sprites/npc/caco_demon/attack/3.png"),
+    image_load(BASE + "sprites/npc/caco_demon/attack/4.png")
+];
+let caco_pain = [
+    image_load(BASE + "sprites/npc/caco_demon/pain/0.png"),
+    image_load(BASE + "sprites/npc/caco_demon/pain/1.png")
+];
+let caco_death = [
+    image_load(BASE + "sprites/npc/caco_demon/death/0.png"),
+    image_load(BASE + "sprites/npc/caco_demon/death/1.png"),
+    image_load(BASE + "sprites/npc/caco_demon/death/2.png"),
+    image_load(BASE + "sprites/npc/caco_demon/death/3.png"),
+    image_load(BASE + "sprites/npc/caco_demon/death/4.png"),
+    image_load(BASE + "sprites/npc/caco_demon/death/5.png")
+];
+
+let cyber_idle = [
+    image_load(BASE + "sprites/npc/cyber_demon/idle/0.png"),
+    image_load(BASE + "sprites/npc/cyber_demon/idle/1.png"),
+    image_load(BASE + "sprites/npc/cyber_demon/idle/2.png"),
+    image_load(BASE + "sprites/npc/cyber_demon/idle/3.png"),
+    image_load(BASE + "sprites/npc/cyber_demon/idle/4.png"),
+    image_load(BASE + "sprites/npc/cyber_demon/idle/5.png"),
+    image_load(BASE + "sprites/npc/cyber_demon/idle/6.png"),
+    image_load(BASE + "sprites/npc/cyber_demon/idle/7.png")
+];
+let cyber_walk = [
+    image_load(BASE + "sprites/npc/cyber_demon/walk/0.png"),
+    image_load(BASE + "sprites/npc/cyber_demon/walk/1.png"),
+    image_load(BASE + "sprites/npc/cyber_demon/walk/3.png"),
+    image_load(BASE + "sprites/npc/cyber_demon/walk/4.png")
+];
+let cyber_attack = [
+    image_load(BASE + "sprites/npc/cyber_demon/attack/0.png"),
+    image_load(BASE + "sprites/npc/cyber_demon/attack/1.png")
+];
+let cyber_pain = [
+    image_load(BASE + "sprites/npc/cyber_demon/pain/0.png"),
+    image_load(BASE + "sprites/npc/cyber_demon/pain/1.png")
+];
+let cyber_death = [
+    image_load(BASE + "sprites/npc/cyber_demon/death/0.png"),
+    image_load(BASE + "sprites/npc/cyber_demon/death/1.png"),
+    image_load(BASE + "sprites/npc/cyber_demon/death/2.png"),
+    image_load(BASE + "sprites/npc/cyber_demon/death/3.png"),
+    image_load(BASE + "sprites/npc/cyber_demon/death/4.png"),
+    image_load(BASE + "sprites/npc/cyber_demon/death/5.png"),
+    image_load(BASE + "sprites/npc/cyber_demon/death/6.png"),
+    image_load(BASE + "sprites/npc/cyber_demon/death/7.png"),
+    image_load(BASE + "sprites/npc/cyber_demon/death/8.png")
+];
+
+let weapon_frames = [
+    image_load(BASE + "sprites/weapon/shotgun/0.png"),
+    image_load(BASE + "sprites/weapon/shotgun/1.png"),
+    image_load(BASE + "sprites/weapon/shotgun/2.png"),
+    image_load(BASE + "sprites/weapon/shotgun/3.png"),
+    image_load(BASE + "sprites/weapon/shotgun/4.png"),
+    image_load(BASE + "sprites/weapon/shotgun/5.png")
+];
+
+let rays = [];
+let ri = 0;
+while (ri < NUM_RAYS) {
+    push(rays, (ri / NUM_RAYS - 0.5) * FOV);
+    ri++;
+}
+
+let player_x = 1.5;
+let player_y = 5.0;
+let player_angle = 0.0;
+let player_health = 100;
+let last_health_tick = 0;
+let rel_mouse = 0;
+let raw_mouse = 0;
+let shot = false;
+let shot_lock = false;
+let weapon_frame = 0;
+let weapon_timer = 0;
+let reloading = false;
+let game_state = "play";
+let state_timer = 0;
+let global_trigger = false;
+let global_prev = 0;
+let objects = [];
+let sky_offset = 0;
+let last_ticks = ticks();
+let delta_time = 16;
+let frame_started = 0;
+
+let sprites = [];
+let npcs = [];
+
+fun map_at(x, y) {
+    if (x < 0 or y < 0 or x >= MAP_W or y >= MAP_H) { return 1; }
+    return MAP[y * MAP_W + x];
+}
+
+fun blocked(x, y) {
+    return map_at(x, y) != 0;
+}
+
+fun angle_norm(a) {
+    while (a < 0) { a += TWO_PI; }
+    while (a >= TWO_PI) { a -= TWO_PI; }
+    return a;
+}
+
+fun angle_diff(a) {
+    while (a > 3.14159) { a -= TWO_PI; }
+    while (a < -3.14159) { a += TWO_PI; }
+    return a;
+}
+
+fun reset_game() {
+    player_x = 1.5;
+    player_y = 5.0;
+    player_angle = 0.0;
+    player_health = 100;
+    last_health_tick = ticks();
+    rel_mouse = 0;
+    raw_mouse = 0;
+    shot = false;
+    shot_lock = false;
+    weapon_frame = 0;
+    weapon_timer = 0;
+    reloading = false;
+    game_state = "play";
+    state_timer = 0;
+    objects = [];
+    sprites = [
+        {x: 11.5, y: 3.5, kind: 1, scale: 0.8, shift: 0.16},
+        {x: 1.5, y: 1.5, kind: 1, scale: 0.8, shift: 0.16},
+        {x: 1.5, y: 7.5, kind: 1, scale: 0.8, shift: 0.16},
+        {x: 5.5, y: 3.25, kind: 1, scale: 0.8, shift: 0.16},
+        {x: 5.5, y: 4.75, kind: 1, scale: 0.8, shift: 0.16},
+        {x: 7.5, y: 2.5, kind: 1, scale: 0.8, shift: 0.16},
+        {x: 7.5, y: 5.5, kind: 1, scale: 0.8, shift: 0.16},
+        {x: 14.5, y: 1.5, kind: 1, scale: 0.8, shift: 0.16},
+        {x: 14.5, y: 4.5, kind: 1, scale: 0.8, shift: 0.16},
+        {x: 14.5, y: 5.5, kind: 2, scale: 0.8, shift: 0.16},
+        {x: 14.5, y: 7.5, kind: 2, scale: 0.8, shift: 0.16},
+        {x: 12.5, y: 7.5, kind: 2, scale: 0.8, shift: 0.16},
+        {x: 9.5, y: 7.5, kind: 2, scale: 0.8, shift: 0.16},
+        {x: 14.5, y: 12.5, kind: 2, scale: 0.8, shift: 0.16},
+        {x: 9.5, y: 20.5, kind: 2, scale: 0.8, shift: 0.16},
+        {x: 10.5, y: 20.5, kind: 2, scale: 0.8, shift: 0.16},
+        {x: 3.5, y: 14.5, kind: 2, scale: 0.8, shift: 0.16},
+        {x: 3.5, y: 18.5, kind: 2, scale: 0.8, shift: 0.16},
+        {x: 14.5, y: 24.5, kind: 1, scale: 0.8, shift: 0.16},
+        {x: 14.5, y: 30.5, kind: 1, scale: 0.8, shift: 0.16},
+        {x: 1.5, y: 30.5, kind: 1, scale: 0.8, shift: 0.16},
+        {x: 1.5, y: 24.5, kind: 1, scale: 0.8, shift: 0.16}
+    ];
+    spawn_npcs();
+}
+
+fun can_walk(x, y) {
+    return !blocked(floor(x), floor(y));
+}
+
+fun make_npc(x, y, kind) {
+    let hp = 100;
+    if (kind == 1) { hp = 150; }
+    if (kind == 2) { hp = 350; }
+    return {x: x, y: y, kind: kind, hp: hp, alive: true, pain: false, awake: false, attack_t: 0, death_frame: 0, path_t: 0, path_x: x, path_y: y};
+}
+
+fun spawn_npcs() {
+    npcs = [];
+    let count = 0;
+    while (count < 20) {
+        let x = rand_int(MAP_W);
+        let y = rand_int(MAP_H);
+        let tries = 0;
+        while ((blocked(x, y) or (x < 10 and y < 10)) and tries < 300) {
+            x = rand_int(MAP_W);
+            y = rand_int(MAP_H);
+            tries++;
+        }
+        if (!blocked(x, y) and !(x < 10 and y < 10)) {
+            let roll = rand_int(100);
+            let kind = 0;
+            if (roll >= 70 and roll < 90) { kind = 1; }
+            if (roll >= 90) { kind = 2; }
+            push(npcs, make_npc(x + 0.5, y + 0.5, kind));
+            count++;
+        } else {
+            count = 20;
+        }
+    }
+}
+
+reset_game();
+
+fun player_move(dx, dy) {
+    let scale = PLAYER_SIZE_SCALE / max(1, delta_time);
+    if (can_walk(player_x + dx * scale, player_y)) { player_x += dx; }
+    if (can_walk(player_x, player_y + dy * scale)) { player_y += dy; }
+}
+
+fun cast_ray_abs(ray_angle) {
+    let sin_a = sin(ray_angle);
+    let cos_a = cos(ray_angle);
+    let x_map = floor(player_x);
+    let y_map = floor(player_y);
+
+    let depth_hor = 99999.0;
+    let x_hor = player_x;
+    let y_hor = player_y;
+    let texture_hor = 1;
+    if (abs(sin_a) > 0.00001) {
+        let y_step = 1;
+        let y_first = y_map + 1.0;
+        if (sin_a < 0) { y_step = -1; y_first = y_map - 0.000001; }
+        depth_hor = (y_first - player_y) / sin_a;
+        x_hor = player_x + depth_hor * cos_a;
+        let delta_depth = y_step / sin_a;
+        let dx = delta_depth * cos_a;
+        let i = 0;
+        while (i < MAX_DEPTH) {
+            let tx = floor(x_hor);
+            let ty = floor(y_first);
+            let t = map_at(tx, ty);
+            if (t > 0) { texture_hor = t; i = MAX_DEPTH; }
+            else {
+                x_hor += dx;
+                y_first += y_step;
+                depth_hor += delta_depth;
+            }
+            i++;
+        }
+    }
+
+    let depth_vert = 99999.0;
+    let y_vert = player_y;
+    let x_vert = player_x;
+    let texture_vert = 1;
+    if (abs(cos_a) > 0.00001) {
+        let x_step = 1;
+        let x_first = x_map + 1.0;
+        if (cos_a < 0) { x_step = -1; x_first = x_map - 0.000001; }
+        depth_vert = (x_first - player_x) / cos_a;
+        y_vert = player_y + depth_vert * sin_a;
+        let delta_depth = x_step / cos_a;
+        let dy = delta_depth * sin_a;
+        let i = 0;
+        while (i < MAX_DEPTH) {
+            let tx = floor(x_first);
+            let ty = floor(y_vert);
+            let t = map_at(tx, ty);
+            if (t > 0) { texture_vert = t; i = MAX_DEPTH; }
+            else {
+                x_first += x_step;
+                y_vert += dy;
+                depth_vert += delta_depth;
+            }
+            i++;
+        }
+    }
+
+    let depth = depth_hor;
+    let texture = texture_hor;
+    let offset = x_hor - floor(x_hor);
+    if (sin_a > 0) { offset = 1 - offset; }
+    let side = 1;
+    if (depth_vert < depth_hor) {
+        depth = depth_vert;
+        texture = texture_vert;
+        offset = y_vert - floor(y_vert);
+        if (cos_a < 0) { offset = 1 - offset; }
+        side = 0;
+    }
+    if (depth < 0.0001) { depth = 0.0001; }
+    return {depth: depth, texture: texture, offset: offset, side: side};
+}
+
+fun ray_wall_distance_to(ex, ey) {
+    return ray_wall_distance_fast(MAP, MAP_W, MAP_H, player_x, player_y, ex, ey);
+}
+
+fun visible_to_player(ex, ey) {
+    let dx = ex - player_x;
+    let dy = ey - player_y;
+    let dist = sqrt(dx * dx + dy * dy);
+    return dist < ray_wall_distance_to(ex, ey);
+}
+
+fun draw_background() {
+    sky_offset = (sky_offset + 4.5 * rel_mouse) % WIDTH;
+    if (sky != 0) {
+        image(sky, -sky_offset, 0, WIDTH, HALF_HEIGHT);
+        image(sky, -sky_offset + WIDTH, 0, WIDTH, HALF_HEIGHT);
+    } else {
+        color(40, 54, 76);
+        rect(0, 0, WIDTH, HALF_HEIGHT);
+    }
+    color(30, 30, 30);
+    rect(0, HALF_HEIGHT, WIDTH, HALF_HEIGHT);
+}
+
+fun draw_wall_column(ray, ray_angle, hit) {
+    let depth = hit.depth * cos(player_angle - ray_angle);
+    if (depth < 0.0001) { depth = 0.0001; }
+    let proj_height = SCREEN_DIST / depth;
+    let img = tex[hit.texture];
+    let x = ray * SCALE;
+    let sx = floor(hit.offset * (TEXTURE_SIZE - SCALE));
+    if (proj_height < HEIGHT) {
+        image_part(img, sx, 0, SCALE, TEXTURE_SIZE, x, HALF_HEIGHT - proj_height / 2, SCALE, proj_height);
+    } else {
+        let texture_height = TEXTURE_SIZE * HEIGHT / proj_height;
+        image_part(img, sx, TEXTURE_SIZE / 2 - texture_height / 2, SCALE, texture_height, x, 0, SCALE, HEIGHT);
+    }
+    if (hit.side == 1) {
+        color(0, 0, 0, 72);
+        if (proj_height < HEIGHT) { rect(x, HALF_HEIGHT - proj_height / 2, SCALE, proj_height); }
+        else { rect(x, 0, SCALE, HEIGHT); }
+    }
+}
+
+fun draw_walls() {
+    raycast_walls(MAP, MAP_W, MAP_H, player_x, player_y, player_angle, FOV, SCREEN_DIST, SCALE, tex, TEXTURE_SIZE, WIDTH, HEIGHT);
+}
+
+fun push_object(depth, img, x, y, w, h) {
+    if (img != 0) { push(objects, {d: depth, img: img, x: x, y: y, w: w, h: h}); }
+}
+
+fun sprite_project(img, sx, sy, scale, shift) {
+    let dx = sx - player_x;
+    let dy = sy - player_y;
+    let theta = atan2(dy, dx);
+    let delta = angle_diff(theta - player_angle);
+    let dist = sqrt(dx * dx + dy * dy);
+    let norm_dist = dist * cos(delta);
+    if (norm_dist <= 0.5) { return null; }
+    let screen_x = (NUM_RAYS / 2 + delta / (FOV / NUM_RAYS)) * SCALE;
+    if (screen_x < -300 or screen_x > WIDTH + 300) { return null; }
+    if (dist > ray_wall_distance_to(sx, sy) + 0.12) { return null; }
+
+    let proj = SCREEN_DIST / norm_dist * scale;
+    let ratio = 1.0;
+    if (img != 0 and image_h(img) > 0) { ratio = image_w(img) / image_h(img); }
+    let pw = proj * ratio;
+    let ph = proj;
+    push_object(norm_dist, img, screen_x - pw / 2, HALF_HEIGHT - ph / 2 + ph * shift, pw, ph);
+}
+
+fun anim_from(list, ms) {
+    return list[floor(ticks() / ms) % len(list)];
+}
+
+fun add_static_sprites() {
+    let i = 0;
+    while (i < len(sprites)) {
+        let img = candle;
+        if (sprites[i].kind == 1) { img = anim_from(green_light, 120); }
+        if (sprites[i].kind == 2) { img = anim_from(red_light, 120); }
+        sprite_project(img, sprites[i].x, sprites[i].y, sprites[i].scale, sprites[i].shift);
+        i++;
+    }
+}
+
+fun npc_frames(npc, mode) {
+    switch (npc.kind) {
+        case 1:
+            switch (mode) {
+                case 1: return caco_walk;
+                case 2: return caco_attack;
+                case 3: return caco_pain;
+                case 4: return caco_death;
+                default: return caco_idle;
+            }
+        case 2:
+            switch (mode) {
+                case 1: return cyber_walk;
+                case 2: return cyber_attack;
+                case 3: return cyber_pain;
+                case 4: return cyber_death;
+                default: return cyber_idle;
+            }
+        default:
+            switch (mode) {
+                case 1: return soldier_walk;
+                case 2: return soldier_attack;
+                case 3: return soldier_pain;
+                case 4: return soldier_death;
+                default: return soldier_idle;
+            }
+    }
+}
+
+fun npc_image(npc) {
+    let frames = npc_frames(npc, 0);
+    if (!npc.alive) {
+        frames = npc_frames(npc, 4);
+        let idx = min(len(frames) - 1, npc.death_frame);
+        return frames[idx];
+    }
+    if (npc.pain) { frames = npc_frames(npc, 3); return anim_from(frames, 100); }
+    if (npc.attack_t > 24) { frames = npc_frames(npc, 2); return anim_from(frames, 120); }
+    if (npc.awake) { frames = npc_frames(npc, 1); return anim_from(frames, 140); }
+    return anim_from(frames, 180);
+}
+
+fun add_npc_sprites() {
+    let i = 0;
+    while (i < len(npcs)) {
+        let scale = 0.6;
+        let shift = 0.38;
+        if (npcs[i].kind == 1) { scale = 0.7; shift = 0.27; }
+        if (npcs[i].kind == 2) { scale = 1.0; shift = 0.04; }
+        sprite_project(npc_image(npcs[i]), npcs[i].x, npcs[i].y, scale, shift);
+        i++;
+    }
+}
+
+fun render_objects() {
+    while (len(objects) > 0) {
+        let best = 0;
+        let i = 1;
+        while (i < len(objects)) {
+            if (objects[i].d > objects[best].d) { best = i; }
+            i++;
+        }
+        let o = remove(objects, best);
+        image(o.img, o.x, o.y, o.w, o.h);
+    }
+}
+
+fun tile_free_for_npc(tx, ty) {
+    if (blocked(tx, ty)) { return false; }
+    let i = 0;
+    while (i < len(npcs)) {
+        if (npcs[i].alive and floor(npcs[i].x) == tx and floor(npcs[i].y) == ty) { return false; }
+        i++;
+    }
+    return true;
+}
+
+fun next_path_cell(sx, sy, gx, gy) {
+    let start = sy * MAP_W + sx;
+    let goal = gy * MAP_W + gx;
+    if (start == goal) { return {x: sx, y: sy}; }
+    let visited = [];
+    let prev = [];
+    let i = 0;
+    while (i < MAP_W * MAP_H) { push(visited, false); push(prev, -1); i++; }
+    let q = [start];
+    visited[start] = true;
+    let head = 0;
+    let dirs = [-1,0, 0,-1, 1,0, 0,1, -1,-1, 1,-1, 1,1, -1,1];
+    while (head < len(q)) {
+        let cur = q[head];
+        head++;
+        if (cur == goal) { head = len(q); }
+        let cx = cur % MAP_W;
+        let cy = floor(cur / MAP_W);
+        let d = 0;
+        while (d < 8) {
+            let nx = cx + dirs[d * 2];
+            let ny = cy + dirs[d * 2 + 1];
+            let ni = ny * MAP_W + nx;
+            if (nx >= 0 and ny >= 0 and nx < MAP_W and ny < MAP_H and !visited[ni] and tile_free_for_npc(nx, ny)) {
+                visited[ni] = true;
+                prev[ni] = cur;
+                push(q, ni);
+            }
+            d++;
+        }
+    }
+    if (!visited[goal]) { return {x: sx, y: sy}; }
+    let step = goal;
+    while (prev[step] != -1 and prev[step] != start) { step = prev[step]; }
+    return {x: step % MAP_W, y: floor(step / MAP_W)};
+}
+
+fun npc_can_walk(npc, dx, dy) {
+    let size = 20;
+    return !blocked(floor(npc.x + dx * size), floor(npc.y)) and !blocked(floor(npc.x), floor(npc.y + dy * size));
+}
+
+fun damage_player(amount) {
+    player_health -= amount;
+    if (player_health < 0) { player_health = 0; }
+    if (player_health <= 0) {
+        game_state = "dead";
+        state_timer = ticks();
+    }
+}
+
+fun update_npcs() {
+    let i = 0;
+    while (i < len(npcs)) {
+        if (npcs[i].alive) {
+            let dxp = player_x - npcs[i].x;
+            let dyp = player_y - npcs[i].y;
+            let dist = sqrt(dxp * dxp + dyp * dyp);
+            let seen = false;
+            if (dist < 9.0) { seen = visible_to_player(npcs[i].x, npcs[i].y); }
+            if (seen) { npcs[i].awake = true; }
+            if (npcs[i].awake) {
+                let attack_dist = 3.0 + rand(3);
+                if (npcs[i].kind == 1) { attack_dist = 1.0; }
+                let speed = 0.030 * delta_time / 16.0;
+                if (npcs[i].kind == 1) { speed = 0.050 * delta_time / 16.0; }
+                if (npcs[i].kind == 2) { speed = 0.055 * delta_time / 16.0; }
+                if (dist < attack_dist and seen) {
+                    if (npcs[i].attack_t <= 0) {
+                        npcs[i].attack_t = 42;
+                        let acc = 0.15;
+                        let dmg = 10;
+                        if (npcs[i].kind == 1) { acc = 0.35; dmg = 25; }
+                        if (npcs[i].kind == 2) { acc = 0.25; dmg = 15; }
+                        if (rand(1) < acc) { damage_player(dmg); }
+                    }
+                } else {
+                    let sx = floor(npcs[i].x);
+                    let sy = floor(npcs[i].y);
+                    let gx = floor(player_x);
+                    let gy = floor(player_y);
+                    if (npcs[i].path_t <= 0 or (floor(npcs[i].path_x) == sx and floor(npcs[i].path_y) == sy)) {
+                        let next = next_path_cell_fast(MAP, MAP_W, MAP_H, sx, sy, gx, gy);
+                        npcs[i].path_x = next % MAP_W + 0.5;
+                        npcs[i].path_y = floor(next / MAP_W) + 0.5;
+                        npcs[i].path_t = 16 + i * 2;
+                    }
+                    let ang = atan2(npcs[i].path_y - npcs[i].y, npcs[i].path_x - npcs[i].x);
+                    let mx = cos(ang) * speed;
+                    let my = sin(ang) * speed;
+                    if (npc_can_walk(npcs[i], mx, 0)) { npcs[i].x += mx; }
+                    if (npc_can_walk(npcs[i], 0, my)) { npcs[i].y += my; }
+                    npcs[i].path_t--;
+                }
+            }
+            if (npcs[i].attack_t > 0) { npcs[i].attack_t--; }
+            if (npcs[i].pain and global_trigger) { npcs[i].pain = false; }
+        } else {
+            if (global_trigger) { npcs[i].death_frame++; }
+        }
+        i++;
+    }
+}
+
+fun find_shot_target() {
+    let best = -1;
+    let best_dist = 99999.0;
+    let i = 0;
+    while (i < len(npcs)) {
+        if (npcs[i].alive) {
+            let dx = npcs[i].x - player_x;
+            let dy = npcs[i].y - player_y;
+            let theta = atan2(dy, dx);
+            let delta = angle_diff(theta - player_angle);
+            let dist = sqrt(dx * dx + dy * dy);
+            let aim = 0.055 + 0.28 / max(1.0, dist);
+            if (abs(delta) < aim and dist < best_dist and visible_to_player(npcs[i].x, npcs[i].y)) {
+                best = i;
+                best_dist = dist;
+            }
+        }
+        i++;
+    }
+    return best;
+}
+
+fun fire_weapon() {
+    if (reloading) { return null; }
+    shot = true;
+    reloading = true;
+    weapon_frame = 0;
+    weapon_timer = ticks();
+    let target = find_shot_target();
+    if (target >= 0) {
+        npcs[target].pain = true;
+        npcs[target].awake = true;
+        npcs[target].hp -= 50;
+        if (npcs[target].hp < 1) {
+            npcs[target].alive = false;
+            npcs[target].death_frame = 0;
+        }
+    }
+}
+
+fun update_weapon() {
+    if (reloading and ticks() - weapon_timer > 90) {
+        weapon_timer = ticks();
+        weapon_frame++;
+        if (weapon_frame >= len(weapon_frames)) {
+            weapon_frame = 0;
+            reloading = false;
+            shot = false;
+        }
+    }
+}
+
+fun live_npcs() {
+    let n = 0;
+    let i = 0;
+    while (i < len(npcs)) {
+        if (npcs[i].alive) { n++; }
+        i++;
+    }
+    return n;
+}
+
+fun update_player() {
+    let speed = 0.004 * delta_time;
+    let sin_a = sin(player_angle);
+    let cos_a = cos(player_angle);
+    let dx = 0.0;
+    let dy = 0.0;
+    let pressed = 0;
+    if (key("W") or key("Up")) { dx += speed * cos_a; dy += speed * sin_a; pressed++; }
+    if (key("S") or key("Down")) { dx -= speed * cos_a; dy -= speed * sin_a; pressed++; }
+    if (key("A")) { dx += speed * sin_a; dy -= speed * cos_a; pressed++; }
+    if (key("D")) { dx -= speed * sin_a; dy += speed * cos_a; pressed++; }
+    if (pressed > 1) { dx *= 0.7071; dy *= 0.7071; }
+    player_move(dx, dy);
+
+    if (key("Left")) { player_angle -= 0.002 * delta_time; }
+    if (key("Right")) { player_angle += 0.002 * delta_time; }
+    player_angle += rel_mouse * MOUSE_SENSITIVITY;
+    player_angle = angle_norm(player_angle);
+
+    if ((mouse_left() or key("Space")) and !shot_lock) {
+        fire_weapon();
+        shot_lock = true;
+    }
+    if (!mouse_left() and !key("Space")) { shot_lock = false; }
+
+    if (ticks() - last_health_tick > 700 and player_health < 100) {
+        last_health_tick = ticks();
+        player_health++;
+    }
+}
+
+fun draw_digits_number(value, x, y) {
+    let v = floor(value);
+    let ds = 45;
+    if (v >= 100) {
+        image(digits[floor(v / 100) % 10], x, y, ds, ds);
+        image(digits[floor(v / 10) % 10], x + ds, y, ds, ds);
+        image(digits[v % 10], x + ds * 2, y, ds, ds);
+        image(digits[10], x + ds * 3, y, ds, ds);
+    } else if (v >= 10) {
+        image(digits[floor(v / 10) % 10], x, y, ds, ds);
+        image(digits[v % 10], x + ds, y, ds, ds);
+        image(digits[10], x + ds * 2, y, ds, ds);
+    } else {
+        image(digits[v % 10], x, y, ds, ds);
+        image(digits[10], x + ds, y, ds, ds);
+    }
+}
+
+fun draw_weapon() {
+    let img = weapon_frames[weapon_frame];
+    if (img != 0) {
+        let ww = image_w(img) * 0.2;
+        let wh = image_h(img) * 0.2;
+        image(img, HALF_WIDTH - ww / 2, HEIGHT - wh, ww, wh);
+    }
+}
+
+fun draw_overlays() {
+    draw_digits_number(player_health, 0, 0);
+    if (player_health < 100 and blood != 0) { image(blood, 0, 0, WIDTH, HEIGHT); }
+    if (game_state == "dead") {
+        if (game_over_img != 0) { image(game_over_img, 0, 0, WIDTH, HEIGHT); }
+        else { color(80, 0, 0, 190); rect(0, 0, WIDTH, HEIGHT); }
+    }
+    if (game_state == "win") {
+        if (win_img != 0) { image(win_img, 0, 0, WIDTH, HEIGHT); }
+        else { color(0, 80, 20, 190); rect(0, 0, WIDTH, HEIGHT); }
+    }
+}
+
+fun update_time() {
+    let now = ticks();
+    frame_started = now;
+    delta_time = now - last_ticks;
+    if (delta_time < 1) { delta_time = 1; }
+    if (delta_time > 32) { delta_time = 32; }
+    last_ticks = now;
+    global_trigger = false;
+    if (now - global_prev > 40) {
+        global_prev = now;
+        global_trigger = true;
+    }
+}
+
+fun update_mouse() {
+    raw_mouse = clamp(mouse_rel_x(), -MOUSE_MAX_REL, MOUSE_MAX_REL);
+    rel_mouse = rel_mouse * MOUSE_SMOOTH + raw_mouse * (1.0 - MOUSE_SMOOTH);
+    if (abs(raw_mouse) < 0.01 and abs(rel_mouse) < 0.08) { rel_mouse = 0; }
+}
+
+fun frame_pace() {
+    let spent = ticks() - frame_started;
+    if (spent < FRAME_TARGET) { delay(FRAME_TARGET - spent); }
+}
+
+while (running()) {
+    poll();
+    if (key("Escape")) {
+         quit(); 
+        }
+    if (key("R")) {
+         reset_game(); }
+
+    update_time();
+    update_mouse();
+
+    if (game_state == "play") {
+        update_player();
+        update_npcs();
+        update_weapon();
+        if (live_npcs() == 0) { game_state = "win"; state_timer = ticks(); }
+    } else {
+        if (ticks() - state_timer > 1500) { reset_game(); }
+    }
+
+    objects = [];
+    clear(0, 0, 0);
+    draw_background();
+    draw_walls();
+    add_static_sprites();
+    add_npc_sprites();
+    render_objects();
+    draw_weapon();
+    draw_overlays();
+    present();
+    frame_pace();
+}
