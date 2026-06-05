@@ -1,15 +1,15 @@
-# ManScript Zero - Referencia da Linguagem
+# ManScript
 
-Este documento descreve a linguagem implementada em `manscript-zero`, com base no runtime atual em `src/mz.c` e no backend SDL em `src/mz_sdl.c`.
+Este documento descreve a linguagem implementada em `manscript`, com base no runtime atual em `src/mz.c` e no backend SDL em `src/mz_sdl.c`.
 
 ## Visao Geral
 
-ManScript Zero e uma linguagem dinamica, interpretada, pequena e pensada para scripts, automacao leve, apps 2D e jogos simples. O nucleo de console fica em `bin/mz.exe`. O backend grafico SDL fica em `bin/mz_sdl.exe`.
+ManScript e uma linguagem dinamica, interpretada, pequena e pensada para scripts, automacao leve, apps 2D e jogos simples. O nucleo de console fica em `bin/mz.exe`. O backend grafico SDL fica em `bin/mz_sdl.exe`.
 
 Exemplo minimo:
 
 ```man
-print("ManScript Zero");
+print("ManScript");
 
 let nome = "Zero";
 let pontos = 10;
@@ -299,7 +299,7 @@ for (let i = 0; i < 5; i++) {
 
 `break` sai do loop. `continue` pula para a proxima iteracao.
 
-Nao existe `for in` no ManScript Zero atual. Para percorrer arrays, use indice:
+Nao existe `for in` no ManScript atual. Para percorrer arrays, use indice:
 
 ```man
 let itens = ["a", "b", "c"];
