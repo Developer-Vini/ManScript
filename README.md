@@ -1,6 +1,6 @@
 # ManScript
 
-Este documento descreve a linguagem implementada em `manscript`, com base no runtime atual em `src/mz.c` e no backend SDL em `src/mz_sdl.c`.
+<image src="logo/logo.png">
 
 ## Visao Geral
 
