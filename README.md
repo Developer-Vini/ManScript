@@ -1,15 +1,15 @@
-# jsScript
+# ManScript
 
 <image src="logo/logo.png">
 
 ## Visao Geral
 
-jsScript e uma linguagem dinamica, interpretada, pequena e pensada para scripts, automacao leve, apps 2D e jogos simples. O nucleo de console fica em `bin/mz.exe`. O backend grafico SDL fica em `bin/mz_sdl.exe`.
+ManScript e uma linguagem dinamica, interpretada, pequena e pensada para scripts, automacao leve, apps 2D e jogos simples. O nucleo de console fica em `bin/mz.exe`. O backend grafico SDL fica em `bin/mz_sdl.exe`.
 
 Exemplo minimo:
 
 ```js
-print("jsScript");
+print("ManScript");
 
 let nome = "Zero";
 let pontos = 10;
@@ -21,7 +21,7 @@ if (pontos > 0) {
 # Instalação
 
 ```powershell
-git clone https://github.com/Developer-Vini/jsScript.git
+git clone https://github.com/Developer-Vini/ManScript.git
 ```
 
 ## Como Executar
@@ -304,7 +304,7 @@ for (let i = 0; i < 5; i++) {
 
 `break` sai do loop. `continue` pula para a proxima iteracao.
 
-Nao existe `for in` no jsScript atual. Para percorrer arrays, use indice:
+Nao existe `for in` no ManScript atual. Para percorrer arrays, use indice:
 
 ```js
 let itens = ["a", "b", "c"];
@@ -665,7 +665,7 @@ Desenha colunas de parede por raycasting no backend C/SDL. `mapa` e um array lin
 
 `ray_wall_distance_fast(mapa, mapa_w, mapa_h, px, py, ex, ey)`
 
-Retorna a distancia ate a primeira parede entre o ponto do player e o ponto alvo. Use para testes de visibilidade/oclusao sem fazer esse raycast em jsScript a cada sprite ou NPC.
+Retorna a distancia ate a primeira parede entre o ponto do player e o ponto alvo. Use para testes de visibilidade/oclusao sem fazer esse raycast em ManScript a cada sprite ou NPC.
 
 `next_path_cell_fast(mapa, mapa_w, mapa_h, sx, sy, gx, gy)`
 
