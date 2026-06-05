@@ -1,8 +1,4 @@
-# Raycast Zero - jogo 2.5D para ManScript Zero
-# Controles: W/S ou setas = andar, A/D = girar, Q/E = lateral, M = mapa, R = reiniciar, Esc = sair
-# Objetivo: pegue os cristais amarelos e entre na saida verde.
-
-window("Raycast Zero", 640, 400);
+window("Raycast", 640, 400);
 
 let W = 640;
 let H = 400;
